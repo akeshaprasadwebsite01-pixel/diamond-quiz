@@ -3,70 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamond Quiz - Earn Free Diamonds</title>
+    <title>Diamond Quiz - Withdraw</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #0f172a; color: white; padding: 20px; margin: 0; }
-        .card { background: #1e293b; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin: 20px auto; max-width: 400px; border: 1px solid #334155; }
-        h2 { color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
-        button { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-size: 16px; margin: 8px; width: 80%; transition: 0.3s; font-weight: bold; }
-        button:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
-        input { padding: 12px; width: 80%; margin: 10px 0; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; text-align: center; }
-        #leaderboard { text-align: left; background: #0f172a; padding: 15px; border-radius: 15px; border: 1px solid #334155; margin-top: 10px; }
-        .coin-box { font-size: 24px; color: #fbbf24; font-weight: bold; margin: 10px 0; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #0f172a; color: white; padding: 10px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin: 10px auto; max-width: 400px; }
+        button { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
+        input { padding: 12px; width: 90%; margin: 8px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
+        .coin-box { font-size: 22px; color: #fbbf24; font-weight: bold; margin: 10px 0; }
+        #withdraw-form, #otp-section { display: none; }
     </style>
 </head>
 <body>
-
     <div class="card">
-        <h2>💎 Diamond Quiz 💎</h2>
+        <h2>💎 Diamond Quiz</h2>
         <div id="login-section">
-            <p>ඔබේ Email එක ඇතුළත් කර ආරම්භ කරන්න</p>
-            <input type="email" id="userEmail" placeholder="example@gmail.com">
-            <button onclick="login()">ඇතුළු වන්න</button>
+            <input type="email" id="userEmail" placeholder="ඔබේ Email ලිපිනය">
+            <button onclick="login()">Start Game</button>
         </div>
 
         <div id="game-section" style="display:none;">
-            <div class="coin-box">💰 <span id="coinCount">0</span></div>
-            <div style="background: #334155; padding: 15px; border-radius: 15px; margin-bottom: 20px;">
-                <h4 id="question" style="margin: 0;">ප්‍රශ්නය පූරණය වෙමින්...</h4>
-            </div>
+            <div class="coin-box">💰 Coins: <span id="coinCount">0</span></div>
+            <h4 id="question">පූරණය වේ...</h4>
             <div id="options"></div>
-            <br><br>
-            <button onclick="withdrawSL()" style="background: linear-gradient(135deg, #10b981, #059669); width: 90%;">Withdraw Diamonds 💎</button>
+            <button onclick="showWithdrawForm()" style="background: #10b981;">Withdraw 2000 💎</button>
+        </div>
+
+        <div id="withdraw-form">
+            <h3>Withdraw Details</h3>
+            <input type="text" id="gameName" placeholder="Game Name">
+            <input type="text" id="gameID" placeholder="Game ID">
+            <input type="text" id="waNumber" placeholder="WhatsApp Number">
+            <button onclick="submitWithdraw()">Submit & Get OTP</button>
+        </div>
+
+        <div id="otp-section">
+            <h3>Verify OTP</h3>
+            <p>ඔබේ WhatsApp අංකයට ලැබුණු කේතය ඇතුළත් කරන්න</p>
+            <input type="text" id="otpInput" placeholder="Enter OTP">
+            <button onclick="verifyOTP()">Verify & Complete</button>
         </div>
     </div>
 
-    <div class="card">
-        <h3>🏆 Top Players</h3>
-        <div id="leaderboard">Loading...</div>
-    </div>
-
     <script>
-        // --- Firebase Configuration ---
-        // අකේෂ්, මම කිව්ව විදිහට මේ කොටසට ඔයාගේ පරණ කෝඩ් එකේ තිබුණු විස්තර ටික පේස්ට් කරන්න.
         const firebaseConfig = {
-            apiKey: "AIzaSy...", 
-            authDomain: "diamond-quiz-xxx.firebaseapp.com",
-            databaseURL: "https://diamond-quiz-xxx.firebaseio.com",
-            projectId: "diamond-quiz-xxx",
-            storageBucket: "diamond-quiz-xxx.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef"
+            apiKey: "AIzaSyDPPY0FzoOv586u9w2LEt1o5wCcLZYyRFI",
+            authDomain: "myrealquiz.firebaseapp.com",
+            databaseURL: "https://myrealquiz-default-rtdb.firebaseio.com",
+            projectId: "myrealquiz",
+            storageBucket: "myrealquiz.firebasestorage.app",
+            messagingSenderId: "318603477232",
+            appId: "1:318603477232:web:c0276ee9771a99fcebc235"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let currentUserEmail = "";
-        let coinsSL = 0;
-        
-        // ඔයා දීපු Adsterra ලින්ක් 4
+        let currentUserEmail = "", coinsSL = 0, generatedOTP = "";
         const ads = [
-            "https://www.effectivegatecpm.com/am6ay8q1r?key=af909ab92962c149bd3203e11f1149d2",
-            "https://www.effectivegatecpm.com/ibn3hw1ffd?key=4ff4d9abaaebe494f5fafe56fd05628f",
+            "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2",
             "https://www.effectivegatecpm.com/nxb65rz1bt?key=d0d811b8ce76499f28dbb7d53dce334d",
-            "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2"
+            "https://www.effectivegatecpm.com/ibn3hw1ffd?key=4ff4d9abaaebe494f5fafe56fd05628f",
+            "https://www.effectivegatecpm.com/am6ay8q1r?key=af909ab92962c149bd3203e11f1149d2"
         ];
 
         function login() {
@@ -75,90 +73,62 @@
                 currentUserEmail = email.replace(/\./g, '_');
                 document.getElementById("login-section").style.display = "none";
                 document.getElementById("game-section").style.display = "block";
-                
-                // ලොග් වෙනකොටත් ඇඩ් එකක් පෙන්වනවා (වැඩිපුර සල්ලි හම්බවෙන්න)
                 window.open(ads[0], "_blank");
-                
-                loadUserData();
-                nextQuestion();
-            } else {
-                alert("කරුණාකර නිවැරදි Email එකක් ඇතුළත් කරන්න.");
+                loadData(); nextQuestion();
             }
         }
 
-        function loadUserData() {
-            db.ref('users/' + currentUserEmail).on('value', (snapshot) => {
-                const data = snapshot.val();
-                coinsSL = data ? data.coins : 0;
+        function loadData() {
+            db.ref('users/' + currentUserEmail).on('value', snap => {
+                coinsSL = snap.val() ? snap.val().coins : 0;
                 document.getElementById("coinCount").innerText = coinsSL;
             });
         }
 
-        const questions = [
-            { q: "Free Fire හි ප්‍රධාන චරිතය කවුද?", a: ["Alok", "Kelly", "Adam"], c: "Adam" },
-            { q: "10 + 5 කීයද?", a: ["12", "15", "20"], c: "15" },
-            { q: "වැඩිම හානියක් (Damage) දෙන තුවක්කුව?", a: ["MP40", "AWM", "M1887"], c: "AWM" },
-            { q: "Free Fire නිපදවූ සමාගම?", a: ["PUBG", "Garena", "Epic Games"], c: "Garena" }
-        ];
-
         function nextQuestion() {
-            let qObj = questions[Math.floor(Math.random() * questions.length)];
-            document.getElementById("question").innerText = qObj.q;
-            let optDiv = document.getElementById("options");
-            optDiv.innerHTML = "";
-            qObj.a.forEach(opt => {
-                let btn = document.createElement("button");
-                btn.innerText = opt;
-                btn.onclick = () => {
-                    if(opt === qObj.c) {
-                        coinsSL += 10;
-                        db.ref('users/' + currentUserEmail).set({ coins: coinsSL });
-                        alert("නිවැරදියි! කොයින් 10ක් ලැබුණා.");
-                        
-                        // සෑම ප්‍රශ්න 2කටම වරක් මාරුවෙන් මාරුවට ඇඩ් එකක් පෙන්වයි
-                        let randAd = ads[Math.floor(Math.random() * 4)];
-                        window.open(randAd, "_blank");
-                    } else {
-                        alert("වැරදියි! නැවත උත්සාහ කරන්න.");
+            document.getElementById("question").innerText = "10 + 20 කීයද?";
+            let optDiv = document.getElementById("options"); optDiv.innerHTML = "";
+            ["20", "30", "40"].forEach(opt => {
+                let b = document.createElement("button"); b.innerText = opt;
+                b.onclick = () => {
+                    if(opt === "30") {
+                        coinsSL += 10; db.ref('users/' + currentUserEmail).set({coins: coinsSL});
+                        window.open(ads[1], "_blank");
                     }
                     nextQuestion();
                 };
-                optDiv.appendChild(btn);
+                optDiv.appendChild(b);
             });
         }
 
-        // Withdraw Function - දැන් මෙතන කෙළින්ම Form එක පෙන්වනවා
-        function withdrawSL() {
-            if (coinsSL < 2000) {
-                alert("Withdraw කිරීමට කොයින් 2000ක් අවශ්‍යයි. තව " + (2000 - coinsSL) + " ක් එකතු කරන්න.");
-                return;
-            }
-
-            // Withdraw පෝරමය පෙන්වීම
-            let playerID = prompt("ඔබේ Free Fire Player ID එක ඇතුළත් කරන්න:");
-            if (playerID && playerID.length > 5) {
-                db.ref('withdrawals/').push({
-                    email: currentUserEmail,
-                    playerID: playerID,
-                    coins: coinsSL,
-                    status: "Pending",
-                    time: new Date().toLocaleString()
-                });
-                alert("ඉල්ලීම සාර්ථකයි! පැය 24ක් ඇතුළත ඩයමන්ඩ් ලැබෙනු ඇත.");
-            }
+        function showWithdrawForm() {
+            if(coinsSL < 2000) return alert("කොයින් 2000ක් අවශ්‍යයි!");
+            document.getElementById("game-section").style.display = "none";
+            document.getElementById("withdraw-form").style.display = "block";
         }
 
-        db.ref('users').orderByChild('coins').limitToLast(5).on('value', (snapshot) => {
-            let leadDiv = document.getElementById("leaderboard");
-            leadDiv.innerHTML = "";
-            let players = [];
-            snapshot.forEach(child => {
-                players.push({ name: child.key.split('_')[0], coins: child.val().coins });
-            });
-            players.reverse().forEach(p => {
-                leadDiv.innerHTML += `<p>👤 ${p.name} - <span style="color:#fbbf24">💰 ${p.coins}</span></p>`;
-            });
-        });
+        function submitWithdraw() {
+            generatedOTP = Math.floor(1000 + Math.random() * 9000);
+            window.open(ads[2], "_blank");
+            alert("ඔබේ WhatsApp අංකයට ලැබෙන OTP එක: " + generatedOTP); // සැබෑ OTP සේවාවක් වෙනුවට මෙහි පෙන්වයි
+            document.getElementById("withdraw-form").style.display = "none";
+            document.getElementById("otp-section").style.display = "block";
+        }
+
+        function verifyOTP() {
+            if(document.getElementById("otpInput").value == generatedOTP) {
+                window.open(ads[3], "_blank");
+                coinsSL -= 2000;
+                db.ref('users/' + currentUserEmail).set({coins: coinsSL});
+                
+                let msg = `Withdraw Request!\nName: ${document.getElementById("gameName").value}\nID: ${document.getElementById("gameID").value}\nWA: ${document.getElementById("waNumber").value}`;
+                window.location.href = `https://wa.me/94741580340?text=${encodeURIComponent(msg)}`;
+                
+                alert("Withdrawal Successful!");
+            } else {
+                alert("වැරදි OTP එකක්!");
+            }
+        }
     </script>
 </body>
 </html>
