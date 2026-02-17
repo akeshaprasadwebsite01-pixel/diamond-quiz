@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Math Quiz - SL Akiya Boy</title>
+    <style>
+        body { background-color: #0f172a; margin: 0; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: white; }
+        .sl-container { width: 100%; max-width: 360px; background: #1e293b; padding: 25px; border-radius: 20px; border: 2px solid #38bdf8; text-align: center; }
+        .sl-btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 15px; transition: 0.3s; }
+        .btn-blue { background: #38bdf8; color: #0f172a; }
+        .btn-green { background: #22c55e; color: white; }
+        .sl-qbox { font-size: 40px; margin: 20px 0; color: #38bdf8; background: #0f172a; padding: 15px; border-radius: 10px; border: 2px dashed #334155; }
+        .sl-stat { background: #334155; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 18px; }
+        input { width: 90%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; text-align: center; font-size: 16px; }
+        #timer-overlay-sl { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 10000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+    </style>
+</head>
+<body>
+
+<div class="sl-container">
+    <h2>💎 Diamond Math Quiz</h2>
+    <p style="color: #38bdf8; font-size: 14px; margin-bottom: 20px;">By SL Akiya Boy</p>
+    
+    <div id="auth-step-sl">
+        <input type="email" id="email-sl" placeholder="Email Address">
+        <input type="password" id="pass-sl" placeholder="Password">
+        <button class="sl-btn btn-blue" onclick="handleAuthSL('login')">Login</button>
+        <button class="sl-btn btn-green" onclick="handleAuthSL('signup')">Create Account</button>
+    </div>
+
+    <div id="game-step-sl" style="display:none;">
+        <div class="sl-stat">Coins: <span id="coinText-sl" style="color:#22c55e; font-weight:bold;">0</span></div>
+        <div id="qBox-sl" class="sl-qbox"></div>
+        <input type="number" id="userAns-sl" placeholder="Enter answer">
+        
+        <button id="ad-btn-sl" class="sl-btn btn-blue" onclick="startAdProcess()">Check & Earn</button>
+        <button class="sl-btn" style="background:#f59e0b; color:white;" onclick="withdrawSL()">Withdraw 2000 Coins</button>
+        
+        <p style="font-size:11px; color:#64748b; margin-top:15px;">User: <span id="userDisp-sl"></span></p>
+        <button onclick="logoutSL()" style="background:none; border:none; color:#ef4444; cursor:pointer; text-decoration:underline;">Logout</button>
+    </div>
+
+    <div id="timer-overlay-sl">
+        <h3 style="color:#38bdf8;">Checking Ad Status...</h3>
+        <div id="timer-display-sl" style="font-size:60px; color:white; font-weight:bold; margin:20px;">20</div>
+        <button id="collect-btn-sl" class="sl-btn btn-green" style="display:none; max-width:250px;" onclick="collectCoinsFinal()">Go & Collect Coins</button>
+    </div>
+    <p style="font-size:11px; color:#64748b; margin-top:10px;">© 2026 SL Akiya Boy.</p>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+    const firebaseConfigSL = {
+        apiKey: "AIzaSyDPPY0FzoOv586u9w2LEt1o5wCcLZYyRFI",
+        authDomain: "myrealquiz.firebaseapp.com",
+        projectId: "myrealquiz",
+        storageBucket: "myrealquiz.firebasestorage.app",
+        messagingSenderId: "318603477232",
+        appId: "1:318603477232:web:c0276ee9771a99fcebc235"
+    };
+
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfigSL); }
+    const authSL = firebase.auth();
+    const dbSL = firebase.database();
+    let coinsSL = 0; let correctAnsSL;
+    
+    const adminWhatsApp = "94741580340"; 
+    const adLink = "https://www.effectivegatecpm.com/nxb65rz1bt?key=d0d811b8ce76499f28dbb7d53dce334d";
+
+    authSL.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('auth-step-sl').style.display = 'none';
+            document.getElementById('game-step-sl').style.display = 'block';
+            document.getElementById('userDisp-sl').innerText = user.email;
+            dbSL.ref('users/' + user.uid).on('value', s => {
+                coinsSL = s.val() ? s.val().coins : 0;
+                document.getElementById('coinText-sl').innerText = coinsSL;
+            });
+            nextQSL();
+        } else {
+            document.getElementById('auth-step-sl').style.display = 'block';
+            document.getElementById('game-step-sl').style.display = 'none';
+        }
+    });
+
+    async function handleAuthSL(type) {
+        const e = document.getElementById('email-sl').value;
+        const p = document.getElementById('pass-sl').value;
+        if(!e || !p) return alert("Fill details");
+        if(type === 'login') window.open(adLink, '_blank');
+        try {
+            if(type === 'signup') await authSL.createUserWithEmailAndPassword(e, p);
+            else await authSL.signInWithEmailAndPassword(e, p);
+        } catch (err) { alert(err.message); }
+    }
+
+    function logoutSL() { authSL.signOut().then(() => location.reload()); }
+
+    function nextQSL() {
+        let a = Math.floor(Math.random() * 20) + 1;
+        let b = Math.floor(Math.random() * 20) + 1;
+        correctAnsSL = a + b;
+        document.getElementById('qBox-sl').innerText = a + " + " + b + " = ?";
+    }
+
+    function startAdProcess() {
+        if(!document.getElementById('userAns-sl').value) return alert("Enter answer first!");
+        window.open(adLink, '_blank');
+        document.getElementById('timer-overlay-sl').style.display = 'flex';
+        document.getElementById('collect-btn-sl').style.display = 'none';
+        let timeLeft = 20;
+        let countdown = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer-display-sl').innerText = timeLeft;
+            if(timeLeft <= 0) {
+                clearInterval(countdown);
+                document.getElementById('collect-btn-sl').style.display = 'block';
+                document.getElementById('timer-display-sl').innerText = "DONE!";
+            }
+        }, 1000);
+    }
+
+    function collectCoinsFinal() {
+        document.getElementById('timer-overlay-sl').style.display = 'none';
+        if(document.getElementById('userAns-sl').value == correctAnsSL) {
+            coinsSL += 10;
+            dbSL.ref('users/' + authSL.currentUser.uid).update({ coins: coinsSL });
+            alert("Correct!"); window.open(adLink, '_blank'); nextQSL();
+        } else { alert("Wrong!"); window.open(adLink, '_blank'); nextQSL(); }
+        document.getElementById('userAns-sl').value = "";
+    }
+
+    function withdrawSL() {
+        if(coinsSL < 2000) {
+            alert("Withdraw කිරීමට කොයින් 2000ක් අවශ්‍යයි.");
+            return; 
+        }
+        
+        let ffid = prompt("Free Fire Player ID:");
+        if(!ffid) return;
+        let ffname = prompt("Game Name:");
+        if(!ffname) return;
+        let userWa = prompt("Your WhatsApp Number:");
+        if(!userWa) return;
+
+        window.open(adLink, '_blank');
+
+        let vCode = "SL" + Math.floor(1000 + Math.random() * 9000); 
+
+        alert("Verification: මීළඟට විවෘත වන WhatsApp මැසේජ් එක Admin ට යවන්න. එහි ඇති Code එක නැවත මෙහි ඇතුළත් කරන්න.");
+        
+        let msg = `*Verification Request*%0AID: ${ffid}%0AName: ${ffname}%0AWA: ${userWa}%0A*Code: ${vCode}*`;
+        window.open("https://wa.me/" + adminWhatsApp + "?text=" + msg, '_blank');
+
+        setTimeout(() => {
+            let enteredCode = prompt("ඔබගේ WhatsApp මැසේජ් එකේ ඇති Code එක ඇතුළත් කරන්න:");
+
+            if(enteredCode === vCode) {
+                let newBal = coinsSL - 2000;
+                dbSL.ref('users/' + authSL.currentUser.uid).update({ coins: newBal }).then(() => {
+                    window.open(adLink, '_blank');
+                    dbSL.ref('withdraw_verifications/' + authSL.currentUser.uid).set({
+                        code: vCode, id: ffid, name: ffname, wa: userWa, status: "Verified", time: new Date().toLocaleString()
+                    });
+                    alert("Success! කොයින් 2000ක් අඩු කරන ලදී.");
+                });
+            } else {
+                alert("වැරදි Code එකක්!");
+            }
+        }, 3000);
+    }
+</script>
+</body>
+</html>
