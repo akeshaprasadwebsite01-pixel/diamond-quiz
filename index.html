@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Quiz Pro - SL Akiya Boy</title>
+    <style>
+        :root { --primary: #38bdf8; --success: #22c55e; --dark: #0f172a; --card: #1e293b; }
+        body { background-color: var(--dark); margin: 0; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: white; }
+        .sl-container { width: 95%; max-width: 400px; background: var(--card); padding: 25px; border-radius: 24px; border: 1px solid rgba(56, 189, 248, 0.3); text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .sl-qbox { font-size: 36px; font-weight: bold; margin: 20px 0; color: var(--primary); background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 15px; border: 2px solid #334155; }
+        .sl-btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 12px; font-size: 16px; transition: 0.2s; }
+        .btn-blue { background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #0f172a; }
+        .btn-green { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .leaderboard-box { margin-top: 25px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; text-align: left; }
+        .lb-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        input { width: 85%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; text-align: center; font-size: 16px; }
+        #timer-overlay-sl { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); z-index: 10000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+    </style>
+</head>
+<body>
+
+<div class="sl-container">
+    <h2 style="margin: 0;">💎 Diamond Quiz</h2>
+    <p style="color: var(--primary); font-size: 12px; margin-bottom: 20px;">BY SL AKIYA BOY</p>
+    
+    <div id="auth-step-sl">
+        <input type="email" id="email-sl" placeholder="Email Address">
+        <input type="password" id="pass-sl" placeholder="Password">
+        <button class="sl-btn btn-blue" onclick="handleAuthSL('login')">LOGIN & OPEN ADS</button>
+        <button class="sl-btn btn-green" onclick="handleAuthSL('signup')">CREATE ACCOUNT</button>
+    </div>
+
+    <div id="game-step-sl" style="display:none;">
+        <div style="display: flex; justify-content: space-between; background: #334155; padding: 12px; border-radius: 12px; margin-bottom: 15px;">
+            <span>Balance:</span>
+            <span id="coinText-sl" style="color:#22c55e; font-weight:bold;">0 Coins</span>
+        </div>
+        <div id="qBox-sl" class="sl-qbox">...</div>
+        <input type="number" id="userAns-sl" placeholder="Enter Answer">
+        <button class="sl-btn btn-blue" onclick="startAdProcess()">SUBMIT & WATCH AD</button>
+        <button class="sl-btn" style="background:#f59e0b; color:white;" onclick="withdrawSL()">WITHDRAW</button>
+        
+        <div class="leaderboard-box">
+            <div style="font-size: 12px; color: var(--primary); font-weight: bold; margin-bottom: 8px;">🏆 TOP 5 PLAYERS</div>
+            <div id="leaderboard-list">Loading...</div>
+        </div>
+        <button onclick="logoutWithAd()" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:11px; margin-top:15px;">LOGOUT</button>
+    </div>
+
+    <div id="timer-overlay-sl">
+        <h3 style="color:var(--primary);">Watching Ad...</h3>
+        <div id="timer-display-sl" style="font-size:60px; font-weight:bold; margin:15px;">20</div>
+        <button id="collect-btn-sl" class="sl-btn btn-green" style="display:none; width:220px;" onclick="collectCoinsFinal()">COLLECT +10 COINS</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+    const firebaseConfigSL = {
+        apiKey: "AIzaSyDPPY0FzoOv586u9w2LEt1o5wCcLZYyRFI",
+        authDomain: "myrealquiz.firebaseapp.com",
+        projectId: "myrealquiz",
+        storageBucket: "myrealquiz.firebasestorage.app",
+        messagingSenderId: "318603477232",
+        appId: "1:318603477232:web:c0276ee9771a99fcebc235"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfigSL);
+    const authSL = firebase.auth(), dbSL = firebase.database();
+    let coinsSL = 0, correctAnsSL;
+    const adLink = "https://www.effectivegatecpm.com/nxb65rz1bt?key=d0d811b8ce76499f28dbb7d53dce334d";
+
+    authSL.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('auth-step-sl').style.display = 'none';
+            document.getElementById('game-step-sl').style.display = 'block';
+            dbSL.ref('users/' + user.uid + '/coins').on('value', s => {
+                coinsSL = s.val() || 0;
+                document.getElementById('coinText-sl').innerText = coinsSL + " Coins";
+            });
+            updateLeaderboard();
+            nextQSL();
+        } else {
+            document.getElementById('auth-step-sl').style.display = 'block';
+            document.getElementById('game-step-sl').style.display = 'none';
+        }
+    });
+
+    async function handleAuthSL(type) {
+        const e = document.getElementById('email-sl').value, p = document.getElementById('pass-sl').value;
+        if(!e || !p) return alert("Details ඇතුළත් කරන්න.");
+        window.open(adLink, '_blank');
+        try {
+            if(type === 'signup') {
+                const res = await authSL.createUserWithEmailAndPassword(e, p);
+                dbSL.ref('users/' + res.user.uid).set({ coins: 0, email: e.split('@')[0] });
+            } else await authSL.signInWithEmailAndPassword(e, p);
+        } catch (err) { alert(err.message); }
+    }
+
+    function logoutWithAd() { window.open(adLink, '_blank'); authSL.signOut().then(() => location.reload()); }
+
+    function updateLeaderboard() {
+        dbSL.ref('users').orderByChild('coins').limitToLast(5).on('value', snapshot => {
+            let html = ''; let items = [];
+            snapshot.forEach(c => { items.push(c.val()); });
+            items.reverse().forEach((u, i) => {
+                html += `<div class="lb-row"><span>${i+1}. ${u.email || 'User'}</span><span>${u.coins}</span></div>`;
+            });
+            document.getElementById('leaderboard-list').innerHTML = html;
+        });
+    }
+
+    function nextQSL() {
+        let a = Math.floor(Math.random() * 20) + 1, b = Math.floor(Math.random() * 20) + 1;
+        correctAnsSL = a + b;
+        document.getElementById('qBox-sl').innerText = `${a} + ${b} = ?`;
+    }
+
+    function startAdProcess() {
+        if(!document.getElementById('userAns-sl').value) return alert("පිළිතුර ඇතුළත් කරන්න!");
+        window.open(adLink, '_blank');
+        document.getElementById('timer-overlay-sl').style.display = 'flex';
+        let time = 20;
+        let timer = setInterval(() => {
+            time--; document.getElementById('timer-display-sl').innerText = time;
+            if(time <= 0) { clearInterval(timer); document.getElementById('collect-btn-sl').style.display = 'block'; }
+        }, 1000);
+    }
+
+    function collectCoinsFinal() {
+        const uAns = document.getElementById('userAns-sl').value;
+        document.getElementById('timer-overlay-sl').style.display = 'none';
+        document.getElementById('collect-btn-sl').style.display = 'none';
+        if(uAns == correctAnsSL) {
+            dbSL.ref('users/' + authSL.currentUser.uid + '/coins').transaction(c => (c || 0) + 10);
+            alert("නිවැරදියි! +10 Coins.");
+        } else alert("වැරදියි!");
+        document.getElementById('userAns-sl').value = "";
+        nextQSL(); window.open(adLink, '_blank');
+    }
+
+    function withdrawSL() {
+        window.open(adLink, '_blank');
+        if(coinsSL < 2000) return alert("Withdraw කිරීමට කොයින් 2000ක් අවශ්‍යයි.");
+        let id = prompt("Free Fire Player ID:");
+        if(id) alert("Admin පරීක්ෂා කර ඔබට Diamond එවනු ඇත!");
+    }
+</script>
+</body>
+</html>
