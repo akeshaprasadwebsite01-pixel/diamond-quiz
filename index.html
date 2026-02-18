@@ -1,155 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="si">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamond Quiz Pro - SL Akiya Boy</title>
+    <title>Diamond Quiz - Withdraw</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        :root { --primary: #38bdf8; --success: #22c55e; --dark: #0f172a; --card: #1e293b; }
-        body { background-color: var(--dark); margin: 0; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: white; }
-        .sl-container { width: 95%; max-width: 400px; background: var(--card); padding: 25px; border-radius: 24px; border: 1px solid rgba(56, 189, 248, 0.3); text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .sl-qbox { font-size: 36px; font-weight: bold; margin: 20px 0; color: var(--primary); background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 15px; border: 2px solid #334155; }
-        .sl-btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 12px; font-size: 16px; transition: 0.2s; }
-        .btn-blue { background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #0f172a; }
-        .btn-green { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
-        .leaderboard-box { margin-top: 25px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; text-align: left; }
-        .lb-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        input { width: 85%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; text-align: center; font-size: 16px; }
-        #timer-overlay-sl { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); z-index: 10000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #0f172a; color: white; padding: 10px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin: 10px auto; max-width: 400px; }
+        button { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
+        input { padding: 12px; width: 90%; margin: 8px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
+        .coin-box { font-size: 22px; color: #fbbf24; font-weight: bold; margin: 10px 0; }
+        #withdraw-form, #otp-section { display: none; }
     </style>
 </head>
 <body>
-
-<div class="sl-container">
-    <h2 style="margin: 0;">💎 Diamond Quiz</h2>
-    <p style="color: var(--primary); font-size: 12px; margin-bottom: 20px;">BY SL AKIYA BOY</p>
-    
-    <div id="auth-step-sl">
-        <input type="email" id="email-sl" placeholder="Email Address">
-        <input type="password" id="pass-sl" placeholder="Password">
-        <button class="sl-btn btn-blue" onclick="handleAuthSL('login')">LOGIN & OPEN ADS</button>
-        <button class="sl-btn btn-green" onclick="handleAuthSL('signup')">CREATE ACCOUNT</button>
-    </div>
-
-    <div id="game-step-sl" style="display:none;">
-        <div style="display: flex; justify-content: space-between; background: #334155; padding: 12px; border-radius: 12px; margin-bottom: 15px;">
-            <span>Balance:</span>
-            <span id="coinText-sl" style="color:#22c55e; font-weight:bold;">0 Coins</span>
+    <div class="card">
+        <h2>💎 Diamond Quiz</h2>
+        <div id="login-section">
+            <input type="email" id="userEmail" placeholder="ඔබේ Email ලිපිනය">
+            <button onclick="login()">Start Game</button>
         </div>
-        <div id="qBox-sl" class="sl-qbox">...</div>
-        <input type="number" id="userAns-sl" placeholder="Enter Answer">
-        <button class="sl-btn btn-blue" onclick="startAdProcess()">SUBMIT & WATCH AD</button>
-        <button class="sl-btn" style="background:#f59e0b; color:white;" onclick="withdrawSL()">WITHDRAW</button>
-        
-        <div class="leaderboard-box">
-            <div style="font-size: 12px; color: var(--primary); font-weight: bold; margin-bottom: 8px;">🏆 TOP 5 PLAYERS</div>
-            <div id="leaderboard-list">Loading...</div>
+
+        <div id="game-section" style="display:none;">
+            <div class="coin-box">💰 Coins: <span id="coinCount">0</span></div>
+            <h4 id="question">පූරණය වේ...</h4>
+            <div id="options"></div>
+            <button onclick="showWithdrawForm()" style="background: #10b981;">Withdraw 2000 💎</button>
         </div>
-        <button onclick="logoutWithAd()" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:11px; margin-top:15px;">LOGOUT</button>
+
+        <div id="withdraw-form">
+            <h3>Withdraw Details</h3>
+            <input type="text" id="gameName" placeholder="Game Name">
+            <input type="text" id="gameID" placeholder="Game ID">
+            <input type="text" id="waNumber" placeholder="WhatsApp Number">
+            <button onclick="submitWithdraw()">Submit & Get OTP</button>
+        </div>
+
+        <div id="otp-section">
+            <h3>Verify OTP</h3>
+            <p>ඔබේ WhatsApp අංකයට ලැබුණු කේතය ඇතුළත් කරන්න</p>
+            <input type="text" id="otpInput" placeholder="Enter OTP">
+            <button onclick="verifyOTP()">Verify & Complete</button>
+        </div>
     </div>
 
-    <div id="timer-overlay-sl">
-        <h3 style="color:var(--primary);">Watching Ad...</h3>
-        <div id="timer-display-sl" style="font-size:60px; font-weight:bold; margin:15px;">20</div>
-        <button id="collect-btn-sl" class="sl-btn btn-green" style="display:none; width:220px;" onclick="collectCoinsFinal()">COLLECT +10 COINS</button>
-    </div>
-</div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPPY0FzoOv586u9w2LEt1o5wCcLZYyRFI",
+            authDomain: "myrealquiz.firebaseapp.com",
+            databaseURL: "https://myrealquiz-default-rtdb.firebaseio.com",
+            projectId: "myrealquiz",
+            storageBucket: "myrealquiz.firebasestorage.app",
+            messagingSenderId: "318603477232",
+            appId: "1:318603477232:web:c0276ee9771a99fcebc235"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+        let currentUserEmail = "", coinsSL = 0, generatedOTP = "";
+        const ads = [
+            "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2",
+            "https://www.effectivegatecpm.com/nxb65rz1bt?key=d0d811b8ce76499f28dbb7d53dce334d",
+            "https://www.effectivegatecpm.com/ibn3hw1ffd?key=4ff4d9abaaebe494f5fafe56fd05628f",
+            "https://www.effectivegatecpm.com/am6ay8q1r?key=af909ab92962c149bd3203e11f1149d2"
+        ];
 
-<script>
-    const firebaseConfigSL = {
-        apiKey: "AIzaSyDPPY0FzoOv586u9w2LEt1o5wCcLZYyRFI",
-        authDomain: "myrealquiz.firebaseapp.com",
-        projectId: "myrealquiz",
-        storageBucket: "myrealquiz.firebasestorage.app",
-        messagingSenderId: "318603477232",
-        appId: "1:318603477232:web:c0276ee9771a99fcebc235"
-    };
-
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfigSL);
-    const authSL = firebase.auth(), dbSL = firebase.database();
-    let coinsSL = 0, correctAnsSL;
-    const adLink = "https://www.effectivegatecpm.com/nxb65rz1bt?key=d0d811b8ce76499f28dbb7d53dce334d";
-
-    authSL.onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById('auth-step-sl').style.display = 'none';
-            document.getElementById('game-step-sl').style.display = 'block';
-            dbSL.ref('users/' + user.uid + '/coins').on('value', s => {
-                coinsSL = s.val() || 0;
-                document.getElementById('coinText-sl').innerText = coinsSL + " Coins";
-            });
-            updateLeaderboard();
-            nextQSL();
-        } else {
-            document.getElementById('auth-step-sl').style.display = 'block';
-            document.getElementById('game-step-sl').style.display = 'none';
+        function login() {
+            let email = document.getElementById("userEmail").value;
+            if(email.includes("@")) {
+                currentUserEmail = email.replace(/\./g, '_');
+                document.getElementById("login-section").style.display = "none";
+                document.getElementById("game-section").style.display = "block";
+                window.open(ads[0], "_blank");
+                loadData(); nextQuestion();
+            }
         }
-    });
 
-    async function handleAuthSL(type) {
-        const e = document.getElementById('email-sl').value, p = document.getElementById('pass-sl').value;
-        if(!e || !p) return alert("Details ඇතුළත් කරන්න.");
-        window.open(adLink, '_blank');
-        try {
-            if(type === 'signup') {
-                const res = await authSL.createUserWithEmailAndPassword(e, p);
-                dbSL.ref('users/' + res.user.uid).set({ coins: 0, email: e.split('@')[0] });
-            } else await authSL.signInWithEmailAndPassword(e, p);
-        } catch (err) { alert(err.message); }
-    }
-
-    function logoutWithAd() { window.open(adLink, '_blank'); authSL.signOut().then(() => location.reload()); }
-
-    function updateLeaderboard() {
-        dbSL.ref('users').orderByChild('coins').limitToLast(5).on('value', snapshot => {
-            let html = ''; let items = [];
-            snapshot.forEach(c => { items.push(c.val()); });
-            items.reverse().forEach((u, i) => {
-                html += `<div class="lb-row"><span>${i+1}. ${u.email || 'User'}</span><span>${u.coins}</span></div>`;
+        function loadData() {
+            db.ref('users/' + currentUserEmail).on('value', snap => {
+                coinsSL = snap.val() ? snap.val().coins : 0;
+                document.getElementById("coinCount").innerText = coinsSL;
             });
-            document.getElementById('leaderboard-list').innerHTML = html;
-        });
-    }
+        }
 
-    function nextQSL() {
-        let a = Math.floor(Math.random() * 20) + 1, b = Math.floor(Math.random() * 20) + 1;
-        correctAnsSL = a + b;
-        document.getElementById('qBox-sl').innerText = `${a} + ${b} = ?`;
-    }
+        function nextQuestion() {
+            document.getElementById("question").innerText = "10 + 20 කීයද?";
+            let optDiv = document.getElementById("options"); optDiv.innerHTML = "";
+            ["20", "30", "40"].forEach(opt => {
+                let b = document.createElement("button"); b.innerText = opt;
+                b.onclick = () => {
+                    if(opt === "30") {
+                        coinsSL += 10; db.ref('users/' + currentUserEmail).set({coins: coinsSL});
+                        window.open(ads[1], "_blank");
+                    }
+                    nextQuestion();
+                };
+                optDiv.appendChild(b);
+            });
+        }
 
-    function startAdProcess() {
-        if(!document.getElementById('userAns-sl').value) return alert("පිළිතුර ඇතුළත් කරන්න!");
-        window.open(adLink, '_blank');
-        document.getElementById('timer-overlay-sl').style.display = 'flex';
-        let time = 20;
-        let timer = setInterval(() => {
-            time--; document.getElementById('timer-display-sl').innerText = time;
-            if(time <= 0) { clearInterval(timer); document.getElementById('collect-btn-sl').style.display = 'block'; }
-        }, 1000);
-    }
+        function showWithdrawForm() {
+            if(coinsSL < 2000) return alert("කොයින් 2000ක් අවශ්‍යයි!");
+            document.getElementById("game-section").style.display = "none";
+            document.getElementById("withdraw-form").style.display = "block";
+        }
 
-    function collectCoinsFinal() {
-        const uAns = document.getElementById('userAns-sl').value;
-        document.getElementById('timer-overlay-sl').style.display = 'none';
-        document.getElementById('collect-btn-sl').style.display = 'none';
-        if(uAns == correctAnsSL) {
-            dbSL.ref('users/' + authSL.currentUser.uid + '/coins').transaction(c => (c || 0) + 10);
-            alert("නිවැරදියි! +10 Coins.");
-        } else alert("වැරදියි!");
-        document.getElementById('userAns-sl').value = "";
-        nextQSL(); window.open(adLink, '_blank');
-    }
+        function submitWithdraw() {
+            generatedOTP = Math.floor(1000 + Math.random() * 9000);
+            window.open(ads[2], "_blank");
+            alert("ඔබේ WhatsApp අංකයට ලැබෙන OTP එක: " + generatedOTP); // සැබෑ OTP සේවාවක් වෙනුවට මෙහි පෙන්වයි
+            document.getElementById("withdraw-form").style.display = "none";
+            document.getElementById("otp-section").style.display = "block";
+        }
 
-    function withdrawSL() {
-        window.open(adLink, '_blank');
-        if(coinsSL < 2000) return alert("Withdraw කිරීමට කොයින් 2000ක් අවශ්‍යයි.");
-        let id = prompt("Free Fire Player ID:");
-        if(id) alert("Admin පරීක්ෂා කර ඔබට Diamond එවනු ඇත!");
-    }
-</script>
+        function verifyOTP() {
+            if(document.getElementById("otpInput").value == generatedOTP) {
+                window.open(ads[3], "_blank");
+                coinsSL -= 2000;
+                db.ref('users/' + currentUserEmail).set({coins: coinsSL});
+                
+                let msg = `Withdraw Request!\nName: ${document.getElementById("gameName").value}\nID: ${document.getElementById("gameID").value}\nWA: ${document.getElementById("waNumber").value}`;
+                window.location.href = `https://wa.me/94741580340?text=${encodeURIComponent(msg)}`;
+                
+                alert("Withdrawal Successful!");
+            } else {
+                alert("වැරදි OTP එකක්!");
+            }
+        }
+    </script>
 </body>
 </html>
