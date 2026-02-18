@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamond Quiz - Withdraw</title>
+    <title>Diamond Quiz - Math Challenge</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #0f172a; color: white; padding: 10px; }
         .card { background: #1e293b; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin: 10px auto; max-width: 400px; }
-        button { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
-        input { padding: 12px; width: 90%; margin: 8px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
+        button { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; transition: 0.2s; }
+        button:hover { transform: scale(1.02); opacity: 0.9; }
+        input { padding: 12px; width: 90%; margin: 8px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; text-align: center; }
         .coin-box { font-size: 22px; color: #fbbf24; font-weight: bold; margin: 10px 0; }
         #withdraw-form, #otp-section { display: none; }
+        .q-box { background: #334155; padding: 15px; border-radius: 15px; margin: 15px 0; font-size: 20px; }
     </style>
 </head>
 <body>
@@ -25,8 +27,11 @@
 
         <div id="game-section" style="display:none;">
             <div class="coin-box">💰 Coins: <span id="coinCount">0</span></div>
-            <h4 id="question">පූරණය වේ...</h4>
+            <div class="q-box">
+                <h4 id="question" style="margin:0;">ප්‍රශ්නය සූදානම් වෙමින්...</h4>
+            </div>
             <div id="options"></div>
+            <br>
             <button onclick="showWithdrawForm()" style="background: #10b981;">Withdraw 2000 💎</button>
         </div>
 
@@ -40,7 +45,6 @@
 
         <div id="otp-section">
             <h3>Verify OTP</h3>
-            <p>ඔබේ WhatsApp අංකයට ලැබුණු කේතය ඇතුළත් කරන්න</p>
             <input type="text" id="otpInput" placeholder="Enter OTP">
             <button onclick="verifyOTP()">Verify & Complete</button>
         </div>
@@ -60,6 +64,8 @@
         const db = firebase.database();
 
         let currentUserEmail = "", coinsSL = 0, generatedOTP = "";
+        let currentAnswer = 0;
+        
         const ads = [
             "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2",
             "https://www.effectivegatecpm.com/nxb65rz1bt?key=d0d811b8ce76499f28dbb7d53dce334d",
@@ -74,7 +80,8 @@
                 document.getElementById("login-section").style.display = "none";
                 document.getElementById("game-section").style.display = "block";
                 window.open(ads[0], "_blank");
-                loadData(); nextQuestion();
+                loadData(); 
+                generateMathQuestion();
             }
         }
 
@@ -85,24 +92,39 @@
             });
         }
 
-        function nextQuestion() {
-            document.getElementById("question").innerText = "10 + 20 කීයද?";
-            let optDiv = document.getElementById("options"); optDiv.innerHTML = "";
-            ["20", "30", "40"].forEach(opt => {
-                let b = document.createElement("button"); b.innerText = opt;
+        // --- අලුත් ප්‍රශ්න පූරණය (1-100 අතර) ---
+        function generateMathQuestion() {
+            let num1 = Math.floor(Math.random() * 100) + 1;
+            let num2 = Math.floor(Math.random() * 100) + 1;
+            currentAnswer = num1 + num2;
+            
+            document.getElementById("question").innerText = `${num1} + ${num2} කීයද?`;
+            
+            let options = [currentAnswer, currentAnswer + 10, currentAnswer - 5];
+            options.sort(() => Math.random() - 0.5); // උත්තර මාරු කිරීම
+            
+            let optDiv = document.getElementById("options");
+            optDiv.innerHTML = "";
+            options.forEach(opt => {
+                let b = document.createElement("button");
+                b.innerText = opt;
                 b.onclick = () => {
-                    if(opt === "30") {
-                        coinsSL += 10; db.ref('users/' + currentUserEmail).set({coins: coinsSL});
+                    if(parseInt(opt) === currentAnswer) {
+                        coinsSL += 10;
+                        db.ref('users/' + currentUserEmail).set({coins: coinsSL});
+                        alert("නිවැරදියි! කොයින් 10ක් ලැබුණා.");
                         window.open(ads[1], "_blank");
+                    } else {
+                        alert("වැරදියි! නැවත උත්සාහ කරන්න.");
                     }
-                    nextQuestion();
+                    generateMathQuestion();
                 };
                 optDiv.appendChild(b);
             });
         }
 
         function showWithdrawForm() {
-            if(coinsSL < 2000) return alert("කොයින් 2000ක් අවශ්‍යයි!");
+            if(coinsSL < 2000) return alert("Withdraw කිරීමට කොයින් 2000ක් අවශ්‍යයි!");
             document.getElementById("game-section").style.display = "none";
             document.getElementById("withdraw-form").style.display = "block";
         }
@@ -110,7 +132,7 @@
         function submitWithdraw() {
             generatedOTP = Math.floor(1000 + Math.random() * 9000);
             window.open(ads[2], "_blank");
-            alert("ඔබේ WhatsApp අංකයට ලැබෙන OTP එක: " + generatedOTP); // සැබෑ OTP සේවාවක් වෙනුවට මෙහි පෙන්වයි
+            alert("ඔබේ OTP කේතය: " + generatedOTP);
             document.getElementById("withdraw-form").style.display = "none";
             document.getElementById("otp-section").style.display = "block";
         }
@@ -121,10 +143,8 @@
                 coinsSL -= 2000;
                 db.ref('users/' + currentUserEmail).set({coins: coinsSL});
                 
-                let msg = `Withdraw Request!\nName: ${document.getElementById("gameName").value}\nID: ${document.getElementById("gameID").value}\nWA: ${document.getElementById("waNumber").value}`;
+                let msg = `Withdraw Request!\nName: ${document.getElementById("gameName").value}\nID: ${document.getElementById("gameID").value}\nWA: ${document.getElementById("waNumber").value}\nAmount: 2000 Diamonds`;
                 window.location.href = `https://wa.me/94741580340?text=${encodeURIComponent(msg)}`;
-                
-                alert("Withdrawal Successful!");
             } else {
                 alert("වැරදි OTP එකක්!");
             }
