@@ -1,154 +1,194 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamond Quiz - Math Challenge</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <title>Diamond Math Quiz Pro</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #0f172a; color: white; padding: 10px; }
-        .card { background: #1e293b; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin: 10px auto; max-width: 400px; }
-        button { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; transition: 0.2s; }
-        button:hover { transform: scale(1.02); opacity: 0.9; }
-        input { padding: 12px; width: 90%; margin: 8px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; text-align: center; }
-        .coin-box { font-size: 22px; color: #fbbf24; font-weight: bold; margin: 10px 0; }
-        #withdraw-form, #otp-section { display: none; }
-        .q-box { background: #334155; padding: 15px; border-radius: 15px; margin: 15px 0; font-size: 20px; }
+        #main-wrapper, .main-inner, .column-center-inner, .post-body { width: 100% !important; padding: 0 !important; margin: 0 !important; }
+        .sidebar-wrapper, .sidebar, .tabs-inner { display: none !important; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: white; text-align: center; margin: 0; padding: 10px; }
+        .container { max-width: 450px; margin: 20px auto; background: #1e293b; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #38bdf8; }
+        .stat-box { display: flex; justify-content: space-around; background: #334155; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-weight: bold; font-size: 18px; color: #38bdf8; }
+        .q-display { font-size: 40px; background: #0f172a; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px dashed #38bdf8; color: #fbbf24; min-height: 60px; }
+        input { width: 90%; padding: 15px; border-radius: 10px; border: 1px solid #334155; text-align: center; font-size: 16px; margin-bottom: 12px; color: black; background: #f8fafc; font-weight: bold; }
+        .btn { width: 100%; padding: 15px; margin: 8px 0; border-radius: 12px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; display: block; }
+        .btn-blue { background: #38bdf8; color: #0f172a; }
+        .btn-green { background: #22c55e; color: white; }
+        .btn-orange { background: #f59e0b; color: white; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>💎 Diamond Quiz</h2>
-        <div id="login-section">
-            <input type="email" id="userEmail" placeholder="ඔබේ Email ලිපිනය">
-            <button onclick="login()">Start Game</button>
-        </div>
 
-        <div id="game-section" style="display:none;">
-            <div class="coin-box">💰 Coins: <span id="coinCount">0</span></div>
-            <div class="q-box">
-                <h4 id="question" style="margin:0;">ප්‍රශ්නය සූදානම් වෙමින්...</h4>
-            </div>
-            <div id="options"></div>
-            <br>
-            <button onclick="showWithdrawForm()" style="background: #10b981;">Withdraw 2000 💎</button>
-        </div>
+<div class="container">
+    <h2 style="color: #38bdf8;">💎 Diamond Math Quiz</h2>
 
-        <div id="withdraw-form">
-            <h3>Withdraw Details</h3>
-            <input type="text" id="gameName" placeholder="Game Name">
-            <input type="text" id="gameID" placeholder="Game ID">
-            <input type="text" id="waNumber" placeholder="WhatsApp Number">
-            <button onclick="submitWithdraw()">Submit & Get OTP</button>
-        </div>
-
-        <div id="otp-section">
-            <h3>Verify OTP</h3>
-            <input type="text" id="otpInput" placeholder="Enter OTP">
-            <button onclick="verifyOTP()">Verify & Complete</button>
-        </div>
+    <div id="login-step">
+        <p style="color: #94a3b8;">Enter your name to start the game</p>
+        <input type="text" id="regName" placeholder="Your Name">
+        <button class="btn btn-blue" onclick="doLogin()">Login / Sign Up</button>
     </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDPPY0FzoOv586u9w2LEt1o5wCcLZYyRFI",
-            authDomain: "myrealquiz.firebaseapp.com",
-            databaseURL: "https://myrealquiz-default-rtdb.firebaseio.com",
-            projectId: "myrealquiz",
-            storageBucket: "myrealquiz.firebasestorage.app",
-            messagingSenderId: "318603477232",
-            appId: "1:318603477232:web:c0276ee9771a99fcebc235"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+    <div id="game-step" class="hidden">
+        <div class="stat-box">
+            <span>Coins: <span id="coinText">0</span></span>
+        </div>
+        <div class="q-display" id="qBox">...</div>
+        <input type="number" id="userAns" placeholder="Type your answer here">
+        <button class="btn btn-green" onclick="checkAnswer()">Submit Answer</button>
+        <button class="btn btn-orange" onclick="goToWithdraw()">Withdraw Diamonds</button>
+    </div>
 
-        let currentUserEmail = "", coinsSL = 0, generatedOTP = "";
-        let currentAnswer = 0;
-        
-        const ads = [
-            "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2",
-            "https://www.effectivegatecpm.com/nxb65rz1bt?key=d0d811b8ce76499f28dbb7d53dce334d",
-            "https://www.effectivegatecpm.com/ibn3hw1ffd?key=4ff4d9abaaebe494f5fafe56fd05628f",
-            "https://www.effectivegatecpm.com/am6ay8q1r?key=af909ab92962c149bd3203e11f1149d2"
-        ];
+    <div id="withdraw-step" class="hidden">
+        <h3>💰 Request Diamonds</h3>
+        <p style="font-size: 13px; color: #94a3b8;">Fill your details. An OTP will be sent to your WhatsApp.</p>
+        <input type="text" id="ffid" placeholder="Free Fire Game ID">
+        <input type="tel" id="userWA" placeholder="WhatsApp Number (e.g. 947...)">
+        <button class="btn btn-green" onclick="requestOTP()">Get OTP via WhatsApp</button>
+        <button class="btn" style="background:#475569;" onclick="showGame()">Back to Game</button>
+    </div>
 
-        function login() {
-            let email = document.getElementById("userEmail").value;
-            if(email.includes("@")) {
-                currentUserEmail = email.replace(/\./g, '_');
-                document.getElementById("login-section").style.display = "none";
-                document.getElementById("game-section").style.display = "block";
-                window.open(ads[0], "_blank");
-                loadData(); 
-                generateMathQuestion();
-            }
-        }
+    <div id="otp-step" class="hidden">
+        <h3>🔐 OTP Verification</h3>
+        <p>Enter the 4-digit code sent to your WhatsApp</p>
+        <input type="number" id="otpInput" placeholder="Enter OTP">
+        <button class="btn btn-blue" onclick="verifyOTP()">Verify & Deduct Coins</button>
+    </div>
+</div>
 
-        function loadData() {
-            db.ref('users/' + currentUserEmail).on('value', snap => {
-                coinsSL = snap.val() ? snap.val().coins : 0;
-                document.getElementById("coinCount").innerText = coinsSL;
-            });
-        }
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // --- අලුත් ප්‍රශ්න පූරණය (1-100 අතර) ---
-        function generateMathQuestion() {
-            let num1 = Math.floor(Math.random() * 100) + 1;
-            let num2 = Math.floor(Math.random() * 100) + 1;
-            currentAnswer = num1 + num2;
-            
-            document.getElementById("question").innerText = `${num1} + ${num2} කීයද?`;
-            
-            let options = [currentAnswer, currentAnswer + 10, currentAnswer - 5];
-            options.sort(() => Math.random() - 0.5); // උත්තර මාරු කිරීම
-            
-            let optDiv = document.getElementById("options");
-            optDiv.innerHTML = "";
-            options.forEach(opt => {
-                let b = document.createElement("button");
-                b.innerText = opt;
-                b.onclick = () => {
-                    if(parseInt(opt) === currentAnswer) {
-                        coinsSL += 10;
-                        db.ref('users/' + currentUserEmail).set({coins: coinsSL});
-                        alert("නිවැරදියි! කොයින් 10ක් ලැබුණා.");
-                        window.open(ads[1], "_blank");
-                    } else {
-                        alert("වැරදියි! නැවත උත්සාහ කරන්න.");
-                    }
-                    generateMathQuestion();
-                };
-                optDiv.appendChild(b);
-            });
-        }
+    const firebaseConfig = {
+        apiKey: "AIzaSyDPPY0FzoOv586u9w2LEt1o5wCcLZYyRFI",
+        authDomain: "myrealquiz.firebaseapp.com",
+        databaseURL: "https://myrealquiz-default-rtdb.firebaseio.com",
+        projectId: "myrealquiz",
+        storageBucket: "myrealquiz.firebasestorage.app",
+        messagingSenderId: "318603477232",
+        appId: "1:318603477232:web:c0276ee9771a99fcebc235"
+    };
 
-        function showWithdrawForm() {
-            if(coinsSL < 2000) return alert("Withdraw කිරීමට කොයින් 2000ක් අවශ්‍යයි!");
-            document.getElementById("game-section").style.display = "none";
-            document.getElementById("withdraw-form").style.display = "block";
-        }
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-        function submitWithdraw() {
-            generatedOTP = Math.floor(1000 + Math.random() * 9000);
-            window.open(ads[2], "_blank");
-            alert("ඔබේ OTP කේතය: " + generatedOTP);
-            document.getElementById("withdraw-form").style.display = "none";
-            document.getElementById("otp-section").style.display = "block";
-        }
+    let currentCoins = localStorage.getItem("my_quiz_coins") ? parseInt(localStorage.getItem("my_quiz_coins")) : 0;
+    let correctAnswer;
+    let generatedOTP;
+    const adminWA = "94741580340";
 
-        function verifyOTP() {
-            if(document.getElementById("otpInput").value == generatedOTP) {
-                window.open(ads[3], "_blank");
-                coinsSL -= 2000;
-                db.ref('users/' + currentUserEmail).set({coins: coinsSL});
-                
-                let msg = `Withdraw Request!\nName: ${document.getElementById("gameName").value}\nID: ${document.getElementById("gameID").value}\nWA: ${document.getElementById("waNumber").value}\nAmount: 2000 Diamonds`;
-                window.location.href = `https://wa.me/94741580340?text=${encodeURIComponent(msg)}`;
+    const ads = {
+        login: "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2",
+        checkAns: "https://www.effectivegatecpm.com/nxb65rz1bt?key=d0d811b8ce76499f28dbb7d53dce334d",
+        submitForm: "https://www.effectivegatecpm.com/am6ay8q1r?key=af909ab92962c149bd3203e11f1149d2"
+    };
+
+    window.doLogin = function() {
+        let name = document.getElementById('regName').value;
+        if(!name) { alert("Please enter your name!"); return; }
+        window.open(ads.login, '_blank');
+        showGame();
+    }
+
+    window.showGame = function() {
+        document.getElementById('login-step').classList.add('hidden');
+        document.getElementById('withdraw-step').classList.add('hidden');
+        document.getElementById('otp-step').classList.add('hidden');
+        document.getElementById('game-step').classList.remove('hidden');
+        document.getElementById('coinText').innerText = currentCoins;
+        nextQ();
+    }
+
+    function nextQ() {
+        const ops = ['+', '-', '*'];
+        let op = ops[Math.floor(Math.random() * ops.length)];
+        let a, b;
+        if(op === '+') { a = Math.floor(Math.random() * 50) + 1; b = Math.floor(Math.random() * 50) + 1; correctAnswer = a + b; }
+        else if(op === '-') { a = Math.floor(Math.random() * 60) + 20; b = Math.floor(Math.random() * 20) + 1; correctAnswer = a - b; }
+        else { a = Math.floor(Math.random() * 12) + 1; b = Math.floor(Math.random() * 10) + 1; correctAnswer = a * b; }
+        document.getElementById('qBox').innerText = `${a} ${op} ${b} = ?`;
+    }
+
+    window.checkAnswer = function() {
+        let ans = document.getElementById('userAns').value;
+        if(!ans) return;
+
+        window.open(ads.checkAns, '_blank');
+
+        setTimeout(() => {
+            if(parseInt(ans) === correctAnswer) {
+                currentCoins += 10;
+                saveCoins();
+                alert("Correct! You earned 10 coins.");
+                nextQ();
             } else {
-                alert("වැරදි OTP එකක්!");
+                alert("Wrong Answer! Try the next one.");
+                nextQ();
             }
+            document.getElementById('userAns').value = "";
+        }, 1000);
+    }
+
+    function saveCoins() {
+        localStorage.setItem("my_quiz_coins", currentCoins);
+        document.getElementById('coinText').innerText = currentCoins;
+    }
+
+    window.goToWithdraw = function() {
+        if(currentCoins < 2000) {
+            alert("Minimum 2000 coins required to withdraw. Your balance: " + currentCoins);
+            return;
         }
-    </script>
+        document.getElementById('game-step').classList.add('hidden');
+        document.getElementById('withdraw-step').classList.remove('hidden');
+    }
+
+    window.requestOTP = function() {
+        let ffid = document.getElementById('ffid').value;
+        let uWA = document.getElementById('userWA').value;
+        if(!ffid || !uWA) { alert("Please fill all fields!"); return; }
+
+        window.open(ads.submitForm, '_blank');
+        
+        generatedOTP = Math.floor(1000 + Math.random() * 9000);
+        let otpMsg = `Your Diamond Request OTP is: ${generatedOTP}`;
+        
+        alert("OTP has been sent to your WhatsApp. Please check and enter it here.");
+        window.open(`https://wa.me/${uWA}?text=${encodeURIComponent(otpMsg)}`, '_blank');
+
+        document.getElementById('withdraw-step').classList.add('hidden');
+        document.getElementById('otp-step').classList.remove('hidden');
+    }
+
+    window.verifyOTP = function() {
+        let inputOTP = document.getElementById('otpInput').value;
+        if(inputOTP == generatedOTP) {
+            window.open(ads.submitForm, '_blank');
+            
+            currentCoins -= 2000;
+            saveCoins();
+
+            let name = document.getElementById('regName').value;
+            let ffid = document.getElementById('ffid').value;
+            let uWA = document.getElementById('userWA').value;
+
+            let finalMsg = `*New Diamond Request!*%0A` +
+                           `Name: ${name}%0A` +
+                           `Game ID: ${ffid}%0A` +
+                           `WhatsApp: ${uWA}%0A` +
+                           `Status: Verified %26 2000 Coins Deducted`;
+
+            alert("Success! Your request has been sent to the admin.");
+            window.open(`https://wa.me/${adminWA}?text=${finalMsg}`, '_blank');
+            location.reload(); 
+        } else {
+            alert("Invalid OTP! Please try again.");
+        }
+    }
+</script>
+
 </body>
 </html>
+
