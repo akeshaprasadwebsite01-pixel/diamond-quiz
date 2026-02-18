@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamond Math Quiz Pro</title>
+    <title>Diamond Math Quiz Pro - Global</title>
     <style>
         #main-wrapper, .main-inner, .column-center-inner, .post-body { width: 100% !important; padding: 0 !important; margin: 0 !important; }
         .sidebar-wrapper, .sidebar, .tabs-inner { display: none !important; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: white; text-align: center; margin: 0; padding: 10px; }
         .container { max-width: 450px; margin: 20px auto; background: #1e293b; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #38bdf8; }
-        .stat-box { display: flex; justify-content: space-around; background: #334155; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-weight: bold; font-size: 18px; color: #38bdf8; }
+        .stat-box { display: flex; justify-content: space-around; background: #334155; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-weight: bold; font-size: 16px; color: #38bdf8; }
         .q-display { font-size: 40px; background: #0f172a; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px dashed #38bdf8; color: #fbbf24; min-height: 60px; }
         input { width: 90%; padding: 15px; border-radius: 10px; border: 1px solid #334155; text-align: center; font-size: 16px; margin-bottom: 12px; color: black; background: #f8fafc; font-weight: bold; }
         .btn { width: 100%; padding: 15px; margin: 8px 0; border-radius: 12px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; display: block; }
@@ -17,6 +17,7 @@
         .btn-green { background: #22c55e; color: white; }
         .btn-orange { background: #f59e0b; color: white; }
         .hidden { display: none; }
+        #displayName { color: #f8fafc; text-transform: capitalize; }
     </style>
 </head>
 <body>
@@ -25,26 +26,28 @@
     <h2 style="color: #38bdf8;">💎 Diamond Math Quiz</h2>
 
     <div id="login-step">
-        <p style="color: #94a3b8;">Enter your name to start the game</p>
-        <input type="text" id="regName" placeholder="Your Name">
+        <p style="color: #94a3b8;">Enter your name to start or resume.</p>
+        <p style="color: #ef4444; font-size: 11px;">Note: Accounts inactive for 2 days will be deleted.</p>
+        <input type="text" id="regName" placeholder="Enter Unique Name">
         <button class="btn btn-blue" onclick="doLogin()">Login / Sign Up</button>
     </div>
 
     <div id="game-step" class="hidden">
         <div class="stat-box">
+            <span>User: <span id="displayName">--</span></span>
             <span>Coins: <span id="coinText">0</span></span>
         </div>
         <div class="q-display" id="qBox">...</div>
-        <input type="number" id="userAns" placeholder="Type your answer here">
+        <input type="number" id="userAns" placeholder="Type your answer">
         <button class="btn btn-green" onclick="checkAnswer()">Submit Answer</button>
         <button class="btn btn-orange" onclick="goToWithdraw()">Withdraw Diamonds</button>
     </div>
 
     <div id="withdraw-step" class="hidden">
         <h3>💰 Request Diamonds</h3>
-        <p style="font-size: 13px; color: #94a3b8;">Fill your details. An OTP will be sent to your WhatsApp.</p>
+        <p style="font-size: 13px; color: #94a3b8;">Details must be accurate. An OTP code will be sent to your WhatsApp.</p>
         <input type="text" id="ffid" placeholder="Free Fire Game ID">
-        <input type="tel" id="userWA" placeholder="WhatsApp Number (e.g. 947...)">
+        <input type="tel" id="userWA" placeholder="WhatsApp No (e.g. 947...)">
         <button class="btn btn-green" onclick="requestOTP()">Get OTP via WhatsApp</button>
         <button class="btn" style="background:#475569;" onclick="showGame()">Back to Game</button>
     </div>
@@ -53,13 +56,13 @@
         <h3>🔐 OTP Verification</h3>
         <p>Enter the 4-digit code sent to your WhatsApp</p>
         <input type="number" id="otpInput" placeholder="Enter OTP">
-        <button class="btn btn-blue" onclick="verifyOTP()">Verify & Deduct Coins</button>
+        <button class="btn btn-blue" onclick="verifyOTP()">Verify & Finalize</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, set, get, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDPPY0FzoOv586u9w2LEt1o5wCcLZYyRFI",
@@ -74,7 +77,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    let currentCoins = localStorage.getItem("my_quiz_coins") ? parseInt(localStorage.getItem("my_quiz_coins")) : 0;
+    let currentCoins = 0;
+    let currentUser = "";
     let correctAnswer;
     let generatedOTP;
     const adminWA = "94741580340";
@@ -85,10 +89,46 @@
         submitForm: "https://www.effectivegatecpm.com/am6ay8q1r?key=af909ab92962c149bd3203e11f1149d2"
     };
 
-    window.doLogin = function() {
-        let name = document.getElementById('regName').value;
+    // --- CLEANUP INACTIVE ACCOUNTS (Older than 2 Days) ---
+    async function cleanInactiveAccounts() {
+        const usersRef = ref(db, 'users');
+        const snapshot = await get(usersRef);
+        const now = Date.now();
+        const twoDaysInMs = 2 * 24 * 60 * 60 * 1000;
+
+        if (snapshot.exists()) {
+            const allUsers = snapshot.val();
+            for (let userId in allUsers) {
+                let lastSeen = allUsers[userId].lastSeen;
+                if (lastSeen && (now - lastSeen > twoDaysInMs)) {
+                    await remove(ref(db, 'users/' + userId));
+                }
+            }
+        }
+    }
+
+    // --- LOGIN LOGIC ---
+    window.doLogin = async function() {
+        let name = document.getElementById('regName').value.trim().toLowerCase();
         if(!name) { alert("Please enter your name!"); return; }
+        
+        currentUser = name;
         window.open(ads.login, '_blank');
+
+        const userRef = ref(db, 'users/' + currentUser);
+        const snapshot = await get(userRef);
+        const timestamp = Date.now();
+
+        if (snapshot.exists()) {
+            currentCoins = snapshot.val().coins || 0;
+            await update(userRef, { lastSeen: timestamp });
+        } else {
+            currentCoins = 0;
+            await set(userRef, { coins: 0, lastSeen: timestamp });
+        }
+
+        await cleanInactiveAccounts(); // Clean others while logging in
+        document.getElementById('displayName').innerText = currentUser;
         showGame();
     }
 
@@ -101,6 +141,7 @@
         nextQ();
     }
 
+    // --- QUIZ LOGIC (+, -, *) ---
     function nextQ() {
         const ops = ['+', '-', '*'];
         let op = ops[Math.floor(Math.random() * ops.length)];
@@ -111,34 +152,37 @@
         document.getElementById('qBox').innerText = `${a} ${op} ${b} = ?`;
     }
 
-    window.checkAnswer = function() {
+    window.checkAnswer = async function() {
         let ans = document.getElementById('userAns').value;
         if(!ans) return;
 
         window.open(ads.checkAns, '_blank');
 
-        setTimeout(() => {
-            if(parseInt(ans) === correctAnswer) {
-                currentCoins += 10;
-                saveCoins();
-                alert("Correct! You earned 10 coins.");
-                nextQ();
-            } else {
-                alert("Wrong Answer! Try the next one.");
-                nextQ();
-            }
-            document.getElementById('userAns').value = "";
-        }, 1000);
+        if(parseInt(ans) === correctAnswer) {
+            currentCoins += 10;
+            await saveCoins();
+            alert("Correct! You earned 10 coins.");
+        } else {
+            alert("Wrong Answer! Try the next one.");
+        }
+        document.getElementById('userAns').value = "";
+        nextQ();
     }
 
-    function saveCoins() {
-        localStorage.setItem("my_quiz_coins", currentCoins);
+    async function saveCoins() {
         document.getElementById('coinText').innerText = currentCoins;
+        if(currentUser) {
+            await update(ref(db, 'users/' + currentUser), { 
+                coins: currentCoins,
+                lastSeen: Date.now() 
+            });
+        }
     }
 
+    // --- WITHDRAW LOGIC ---
     window.goToWithdraw = function() {
         if(currentCoins < 2000) {
-            alert("Minimum 2000 coins required to withdraw. Your balance: " + currentCoins);
+            alert("Minimum 2000 coins required. Your balance: " + currentCoins);
             return;
         }
         document.getElementById('game-step').classList.add('hidden');
@@ -155,40 +199,38 @@
         generatedOTP = Math.floor(1000 + Math.random() * 9000);
         let otpMsg = `Your Diamond Request OTP is: ${generatedOTP}`;
         
-        alert("OTP has been sent to your WhatsApp. Please check and enter it here.");
+        alert("OTP sent to WhatsApp. Enter it in the next step.");
         window.open(`https://wa.me/${uWA}?text=${encodeURIComponent(otpMsg)}`, '_blank');
 
         document.getElementById('withdraw-step').classList.add('hidden');
         document.getElementById('otp-step').classList.remove('hidden');
     }
 
-    window.verifyOTP = function() {
+    window.verifyOTP = async function() {
         let inputOTP = document.getElementById('otpInput').value;
         if(inputOTP == generatedOTP) {
             window.open(ads.submitForm, '_blank');
             
             currentCoins -= 2000;
-            saveCoins();
+            await saveCoins();
 
-            let name = document.getElementById('regName').value;
             let ffid = document.getElementById('ffid').value;
             let uWA = document.getElementById('userWA').value;
 
             let finalMsg = `*New Diamond Request!*%0A` +
-                           `Name: ${name}%0A` +
+                           `Name: ${currentUser}%0A` +
                            `Game ID: ${ffid}%0A` +
                            `WhatsApp: ${uWA}%0A` +
                            `Status: Verified %26 2000 Coins Deducted`;
 
-            alert("Success! Your request has been sent to the admin.");
+            alert("Success! Your request has been sent.");
             window.open(`https://wa.me/${adminWA}?text=${finalMsg}`, '_blank');
             location.reload(); 
         } else {
-            alert("Invalid OTP! Please try again.");
+            alert("Invalid OTP!");
         }
     }
 </script>
 
 </body>
 </html>
-
