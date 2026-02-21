@@ -1,1 +1,222 @@
 
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💎 Diamond Math Quiz - Pro Edition</title>
+    
+    <style>
+        /* Sidebar සහ අනවශ්‍ය කොටස් අයින් කිරීම */
+        #main-wrapper, .main-inner, .column-center-inner, .post-body { width: 100% !important; padding: 0 !important; margin: 0 !important; }
+        .sidebar-wrapper, .sidebar, .tabs-inner { display: none !important; }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: white; text-align: center; margin: 0; padding: 10px; }
+        .container { max-width: 420px; margin: 20px auto; background: #1e293b; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #38bdf8; }
+        .stat-box { display: flex; justify-content: space-around; background: #334155; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-weight: bold; border-bottom: 3px solid #38bdf8; }
+        .q-display { font-size: 48px; background: #0f172a; padding: 25px; border-radius: 15px; margin-bottom: 20px; border: 2px dashed #38bdf8; color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+        input { width: 90%; padding: 15px; border-radius: 12px; border: 1px solid #334155; text-align: center; font-size: 16px; margin-bottom: 12px; color: black; background: #f8fafc; outline: none; }
+        input:focus { border-color: #38bdf8; }
+        .btn { width: 100%; padding: 15px; margin: 8px 0; border-radius: 12px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; display: block; }
+        .btn-blue { background: #38bdf8; color: #0f172a; }
+        .btn-green { background: #22c55e; color: white; }
+        .btn-orange { background: #f59e0b; color: white; }
+        .btn-verify { background: #8b5cf6; color: white; margin-top: 5px; font-size: 14px; padding: 10px; }
+        .hidden { display: none; }
+        .success-msg { color: #22c55e; font-weight: bold; margin: 10px 0; background: rgba(34, 197, 94, 0.1); padding: 10px; border-radius: 10px; }
+        .info-text { color: #94a3b8; font-size: 13px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>💎 Diamond Math Quiz</h2>
+
+    <div id="login-step">
+        <p class="info-text">සෙල්ලම් කිරීමට නම ඇතුළත් කර ලොග් වන්න</p>
+        <input type="text" id="regName" placeholder="Enter Your Name">
+        <button class="btn btn-blue" onclick="doLogin()">Sign Up / Login</button>
+    </div>
+
+    <div id="game-step" class="hidden">
+        <div class="stat-box">
+            <span>👤 <span id="displayName"></span></span>
+            <span>💰 <span id="coinText">0</span></span>
+        </div>
+        <div class="q-display" id="qBox"></div>
+        <input type="number" id="userAns" placeholder="ඔබේ පිළිතුර මෙතන ලියන්න">
+        <button class="btn btn-green" onclick="checkAnswer()">Check Answer</button>
+        <button class="btn btn-orange" onclick="goToWithdraw()">Withdraw Diamonds</button>
+    </div>
+
+    <div id="withdraw-step" class="hidden">
+        <h3>💰 Request Diamonds</h3>
+        <p id="playerDisplayInfo" style="color:#38bdf8; font-weight:bold; margin-bottom:15px;"></p>
+        
+        <input type="text" id="ffid" placeholder="Free Fire Player ID">
+        
+        <div id="wa-section">
+            <p class="info-text">WhatsApp අංකය Country Code එක සමඟ ඇතුළත් කරන්න (Ex: 94771234567)</p>
+            <input type="tel" id="whatsapp" placeholder="WhatsApp Number" oninput="toggleVerifyBtn()">
+            <button id="verifyBtn" class="btn btn-verify hidden" onclick="sendVerificationCode()">Verify Number via WhatsApp</button>
+        </div>
+
+        <div id="code-section" class="hidden">
+            <p class="info-text">ඔබේ WhatsApp එකට දැන් ලැබුණු අංකය ඇතුළත් කරන්න</p>
+            <input type="number" id="inputCode" placeholder="Enter 4-Digit Code">
+            <button class="btn btn-blue" onclick="verifyTheCode()">Verify Code</button>
+        </div>
+
+        <div id="verifyStatus" class="success-msg hidden">✅ Verification Success!</div>
+
+        <button id="finalSubmitBtn" class="btn btn-green hidden" onclick="submitToWA()">Submit & Get Diamonds</button>
+        <button class="btn" style="background:#475569;" onclick="goBackToGame()">Back to Game</button>
+    </div>
+</div>
+
+<script>
+    /* --- ADS CONFIGURATION --- */
+    // ඔයාගේ ඇඩ් ලින්ක් ටික පහත quotation marks (" ") ඇතුළත දාන්න
+    const myNumber = "947XXXXXXXXX"; // ඔයාගේ WhatsApp අංකය (94 සමඟ)
+    const adsterraDirectLink = "YOUR_ADSTERRA_DIRECT_LINK_HERE";
+    const cpaLeadOfferwall = "YOUR_CPALEAD_OFFERWALL_LINK_HERE";
+
+    let currentCoins = localStorage.getItem("my_quiz_coins") ? parseInt(localStorage.getItem("my_quiz_coins")) : 0;
+    let correctAnswer;
+    let playerName = "";
+    let generatedCode;
+    let isVerified = false;
+
+    // --- GAME LOGIC ---
+
+    function openAd() {
+        // Direct Link එක අලුත් Tab එකක විවෘත කිරීම
+        if(adsterraDirectLink !== "YOUR_ADSTERRA_DIRECT_LINK_HERE") {
+            window.open(adsterraDirectLink, '_blank');
+        }
+    }
+
+    function doLogin() {
+        playerName = document.getElementById('regName').value.trim();
+        if(!playerName) { alert("කරුණාකර නම ඇතුළත් කරන්න"); return; }
+        
+        openAd(); // Login Adsterra Direct Link
+        
+        document.getElementById('login-step').classList.add('hidden');
+        document.getElementById('game-step').classList.remove('hidden');
+        document.getElementById('displayName').innerText = playerName;
+        document.getElementById('coinText').innerText = currentCoins;
+        nextQ();
+    }
+
+    function nextQ() {
+        let a = Math.floor(Math.random() * 20) + 1;
+        let b = Math.floor(Math.random() * 20) + 1;
+        correctAnswer = a + b;
+        document.getElementById('qBox').innerText = `${a} + ${b} = ?`;
+    }
+
+    function checkAnswer() {
+        let ans = document.getElementById('userAns').value;
+        if(!ans) return;
+
+        openAd(); // Answer checking Direct Link ad
+
+        if(ans == correctAnswer) {
+            currentCoins += 10;
+            localStorage.setItem("my_quiz_coins", currentCoins);
+            document.getElementById('coinText').innerText = currentCoins;
+            alert("නිවැරදියි! ඔබට කොයින් 10ක් ලැබුණා.");
+            nextQ();
+        } else {
+            alert("වැරදියි! නැවත උත්සාහ කරන්න.");
+        }
+        document.getElementById('userAns').value = "";
+    }
+
+    function goToWithdraw() {
+        if(currentCoins < 2000) {
+            alert("Withdraw කිරීමට කොයින් 2000ක් අවශ්‍යයි. ඔබ සතුව ඇත්තේ: " + currentCoins);
+            return;
+        }
+        openAd(); // Withdraw transition ad
+        document.getElementById('game-step').classList.add('hidden');
+        document.getElementById('withdraw-step').classList.remove('hidden');
+        document.getElementById('playerDisplayInfo').innerText = "Player: " + playerName;
+    }
+
+    // --- VERIFICATION & WITHDRAW LOGIC ---
+
+    function toggleVerifyBtn() {
+        let num = document.getElementById('whatsapp').value;
+        // නම්බර් එක ඉලක්කම් 10කට වඩා වැඩි නම් බටන් එක පෙන්වයි
+        if(num.length >= 10) {
+            document.getElementById('verifyBtn').classList.remove('hidden');
+        } else {
+            document.getElementById('verifyBtn').classList.add('hidden');
+        }
+    }
+
+    function sendVerificationCode() {
+        let userWA = document.getElementById('whatsapp').value;
+        generatedCode = Math.floor(1000 + Math.random() * 9000); // අහඹු අංක 4ක් ජනනය කිරීම
+        
+        alert("ඔබේ WhatsApp එකට කේතයක් එවනු ඇත. එය බලාගෙන මෙහි ඇතුළත් කරන්න.");
+        
+        // Admin (ඔයාට) මැසේජ් එක එන විදිහ
+        let msg = `Verification Code for ${playerName}: ${generatedCode}`;
+        let url = `https://wa.me/${myNumber}?text=${encodeURIComponent(msg)}`;
+        
+        window.open(url, '_blank'); 
+        
+        document.getElementById('wa-section').classList.add('hidden');
+        document.getElementById('code-section').classList.remove('hidden');
+    }
+
+    function verifyTheCode() {
+        let input = document.getElementById('inputCode').value;
+        if(input == generatedCode) {
+            isVerified = true;
+            document.getElementById('code-section').classList.add('hidden');
+            document.getElementById('verifyStatus').classList.remove('hidden');
+            document.getElementById('finalSubmitBtn').classList.remove('hidden');
+        } else {
+            alert("වැරදි කේතයක්! කරුණාකර නැවත පරීක්ෂා කරන්න.");
+        }
+    }
+
+    function submitToWA() {
+        let ffid = document.getElementById('ffid').value;
+        let wa = document.getElementById('whatsapp').value;
+
+        if(!ffid || !wa) { alert("කරුණාකර සියලු විස්තර සම්පූර්ණ කරන්න!"); return; }
+
+        // Final Submission වලදී Offerwall එක පෙන්වීම (High Earnings)
+        alert("ඔබේ Request එක Submit කිරීමට පෙර මෙම අවසන් පියවර (Offer) සම්පූර්ණ කරන්න.");
+        if(cpaLeadOfferwall !== "YOUR_CPALEAD_OFFERWALL_LINK_HERE") {
+            window.open(cpaLeadOfferwall, '_blank');
+        }
+
+        let message = `*--- NEW DIAMOND REQUEST ---*%0A` +
+                      `*Player Name:* ${playerName}%0A` +
+                      `*Free Fire ID:* ${ffid}%0A` +
+                      `*WhatsApp:* ${wa}%0A` +
+                      `*Coins Earned:* ${currentCoins}%0A` +
+                      `*Status:* Verified ✅`;
+
+        let waURL = `https://wa.me/${myNumber}?text=${message}`;
+        
+        // Offer එක බලන්න කාලය දී මැසේජ් එක යැවීම
+        setTimeout(() => {
+            window.open(waURL, '_blank');
+        }, 3000);
+    }
+
+    function goBackToGame() {
+        document.getElementById('withdraw-step').classList.add('hidden');
+        document.getElementById('game-step').classList.remove('hidden');
+    }
+</script>
+
+</body>
+</html>
