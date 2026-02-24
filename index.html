@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="monetag" content="f4e50b809c4bf760df194a3121376966">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diamond Math Quiz - Smart System</title>
 
     <script src="https://pl28762541.effectivegatecpm.com/49/fe/bc/49febcbf5c03dbc1bd4f30769154431e.js"></script>
-
     <script type="text/javascript" src="https://ridefiles.net/script_include.php?id=1878026"></script>
 
     <style>
@@ -82,16 +83,14 @@
     let currentCorrect, generatedVCode;
     let isWaitingForAd = false;
 
-    // Open random Adsterra Direct Link
     function triggerAd() {
         let link = directLinks[Math.floor(Math.random() * directLinks.length)];
         window.open(link, '_blank');
     }
 
-    // 1. Login (CPAGrip Offerwall)
     function doLogin() {
         if(!document.getElementById('regName').value) return alert("Please enter your name!");
-        call_locker(); 
+        if (typeof call_locker === "function") call_locker(); 
         document.getElementById('login-step').classList.add('hidden');
         document.getElementById('game-step').classList.remove('hidden');
         nextQ();
@@ -106,7 +105,6 @@
         document.getElementById('ad-status').style.color = "#f87171";
     }
 
-    // 2. Check Answer with Anti-Cheat
     function checkAnswer() {
         let ans = document.getElementById('userAns').value;
         if(ans == currentCorrect) {
@@ -117,7 +115,6 @@
             
             triggerAd();
 
-            // Check if user left and returned
             let focusChecker = setInterval(() => {
                 if (document.hasFocus() && isWaitingForAd) {
                     coins += 10;
@@ -137,14 +134,12 @@
         document.getElementById('userAns').value = "";
     }
 
-    // 3. Withdraw Page
     function goToWithdraw() {
         triggerAd();
         document.getElementById('game-step').classList.add('hidden');
         document.getElementById('withdraw-step').classList.remove('hidden');
     }
 
-    // 4. Smart WhatsApp Verification
     function sendVerifyCode() {
         let name = document.getElementById('regName').value;
         let phone = document.getElementById('userWhatsApp').value;
@@ -154,7 +149,6 @@
         document.getElementById('displayCode').innerText = generatedVCode;
         
         triggerAd();
-        // Send code to Admin WhatsApp
         window.open(`https://wa.me/${adminWhatsApp}?text=*Verification Request*%0AName: ${name}%0ACode: ${generatedVCode}`, '_blank');
         
         document.getElementById('verifyBtn').classList.add('hidden');
@@ -171,9 +165,8 @@
         }
     }
 
-    // 5. Final Submit (ID & Coins to WhatsApp)
     function finalSubmit() {
-        call_locker();
+        if (typeof call_locker === "function") call_locker();
         let name = document.getElementById('regName').value;
         let id = document.getElementById('ffid').value;
         let finalMsg = `*Withdrawal Request*%0AName: ${name}%0AID: ${id}%0ACoins: ${coins}%0AStatus: Verified ✅`;
