@@ -1,103 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Math Quiz - Earn Global</title>
+    
     <meta name="64b581e0b9e8e613da8ebf1c75f3d32500907749" content="64b581e0b9e8e613da8ebf1c75f3d32500907749" />
     <meta name="referrer" content="no-referrer-when-downgrade" />
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamond Math Quiz</title>
-
-    <script src="https://pl28762541.effectivegatecpm.com/49/fe/bc/49febcbf5c03dbc1bd4f30769154431e.js"></script>
-
-    <script type="text/javascript" src="https://ridefiles.net/script_include.php?id=1878026"></script>
-
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #0b101b; color: white; text-align: center; margin: 0; padding: 10px; }
-        .container { max-width: 420px; margin: 20px auto; background: #1a202e; padding: 25px; border-radius: 20px; border: 2px solid #00d4ff; box-shadow: 0 0 15px rgba(0, 212, 255, 0.2); }
-        .q-display { font-size: 45px; background: #0b101b; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px dashed #00d4ff; color: #00d4ff; }
-        input { width: 90%; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; background: #0f172a; color: white; border: 1px solid #334155; font-size: 18px; }
-        .btn { width: 100%; padding: 16px; margin: 10px 0; border-radius: 12px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-blue { background: linear-gradient(90deg, #00d4ff, #0072ff); color: white; }
-        .btn-green { background: #10b981; color: white; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #0f172a; color: white; text-align: center; margin: 0; padding: 15px; }
+        .container { max-width: 450px; margin: 30px auto; background: #1e293b; padding: 25px; border-radius: 20px; border: 2px solid #38bdf8; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .score-box { background: #334155; padding: 10px; border-radius: 12px; margin-bottom: 20px; font-weight: bold; color: #38bdf8; font-size: 18px; }
+        #qBox { font-size: 45px; background: #0f172a; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px dashed #38bdf8; color: #fbbf24; }
+        input { width: 85%; padding: 15px; border-radius: 10px; border: none; text-align: center; font-size: 20px; margin-bottom: 15px; font-weight: bold; }
+        .btn { width: 90%; padding: 15px; border-radius: 12px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 10px; }
+        .btn-green { background: #22c55e; color: white; }
         .btn-orange { background: #f59e0b; color: white; }
-        .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>💎 Diamond Math Quiz</h2>
-    
-    <div id="login-step">
-        <input type="text" id="regName" placeholder="Enter Your Name">
-        <button class="btn btn-blue" onclick="doLogin()">Login & Start Game</button>
+    <h2 style="color: #38bdf8;">💎 Diamond Math Quiz</h2>
+    <p style="color: #94a3b8;">Solve & Earn Real Rewards</p>
+
+    <div class="score-box">
+        Coins: <span id="coinCount">0</span>
     </div>
 
-    <div id="game-step" class="hidden">
-        <div style="margin-bottom: 10px; font-size: 20px;">Coins: <span id="coinText" style="color:#00d4ff; font-weight: bold;">0</span></div>
-        <div id="qBox" class="q-display"></div>
-        <input type="number" id="userAns" placeholder="Type your answer here">
-        <button id="checkBtn" class="btn btn-green" onclick="checkAnswer()">Check Answer</button>
-        <button class="btn btn-orange" onclick="goToWithdraw()">Withdraw Coins</button>
-    </div>
+    <div id="qBox">...</div>
+    <input type="number" id="userAns" placeholder="Your Answer">
+    
+    <button class="btn btn-green" onclick="checkResult()">Submit Answer</button>
+    <button class="btn btn-orange" onclick="withdrawDiamonds()">Withdraw Diamonds</button>
 </div>
 
 <script>
-    // --- Ad Configuration (Direct Links) ---
-    const adLinks = [
-        "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2", // Adsterra 1
-        "https://www.effectivegatecpm.com/nxb65rz1bt?key=d0d811b8ce76499f28dbb7d53dce334d"  // Adsterra 2
-    ];
-
     let coins = 0;
-    let currentCorrect;
+    let correctValue;
+    // Adsterra Link
+    const adsterraDirect = "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2";
+    // Your CPAGrip Global Link
+    const globalCpaLink = "https://ridefiles.net/1879367"; 
 
-    // විනාඩි 2කට වරක් හෝ පිළිතුරක් දුන් විට Adsterra Direct Link එකක් Open වේ
-    function triggerDirectAd() {
-        let randomAd = adLinks[Math.floor(Math.random() * adLinks.length)];
-        window.open(randomAd, '_blank');
-    }
-
-    function doLogin() {
-        let name = document.getElementById('regName').value;
-        if(!name) {
-            alert("Please enter your name!");
-            return;
-        }
-        document.getElementById('login-step').classList.add('hidden');
-        document.getElementById('game-step').classList.remove('hidden');
-        nextQ();
-    }
-
-    function nextQ() {
-        let a = Math.floor(Math.random() * 15) + 5;
+    function loadNewQ() {
+        let a = Math.floor(Math.random() * 10) + 5;
         let b = Math.floor(Math.random() * 10) + 2;
-        currentCorrect = a + b;
-        document.getElementById('qBox').innerText = `${a} + ${b}`;
+        correctValue = a + b;
+        document.getElementById('qBox').innerText = a + " + " + b + " = ?";
     }
 
-    function checkAnswer() {
-        let ans = document.getElementById('userAns').value;
-        if(ans == currentCorrect) {
+    window.checkResult = function() {
+        let val = document.getElementById('userAns').value;
+        if(!val) return;
+        
+        window.open(adsterraDirect, '_blank'); // Adsterra Pop
+        
+        if(parseInt(val) === correctValue) {
             coins += 10;
-            document.getElementById('coinText').innerText = coins;
-            triggerDirectAd(); // පිළිතුර හරි නම් Ad එකක් පෙන්වයි
-            nextQ();
+            document.getElementById('coinCount').innerText = coins;
+            alert("Correct! +10 Coins");
         } else {
-            alert("Wrong Answer! Try again.");
+            alert("Wrong! Try again.");
         }
         document.getElementById('userAns').value = "";
+        loadNewQ();
     }
 
-    function goToWithdraw() {
-        // Withdraw Button එක එබූ විට CPAGrip Content Locker එක වැඩ කරයි
-        if(typeof call_locker === 'function') {
-            call_locker();
+    window.withdrawDiamonds = function() {
+        if(coins >= 50) {
+            window.open(globalCpaLink, '_blank'); // CPAGrip Global Locker
         } else {
-            alert("Processing your withdrawal... Please wait.");
+            alert("You need at least 50 coins to withdraw!");
         }
     }
+
+    loadNewQ();
 </script>
 
 </body>
