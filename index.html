@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="monetag" content="f4e50b809c4bf760df194a3121376966">
+    <meta name="64b581e0b9e8e613da8ebf1c75f3d32500907749" content="64b581e0b9e8e613da8ebf1c75f3d32500907749" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -90,7 +91,7 @@
 
     function doLogin() {
         if(!document.getElementById('regName').value) return alert("Please enter your name!");
-        if (typeof call_locker === "function") call_locker(); 
+        if(typeof call_locker === "function") call_locker(); 
         document.getElementById('login-step').classList.add('hidden');
         document.getElementById('game-step').classList.remove('hidden');
         nextQ();
@@ -166,7 +167,7 @@
     }
 
     function finalSubmit() {
-        if (typeof call_locker === "function") call_locker();
+        if(typeof call_locker === "function") call_locker();
         let name = document.getElementById('regName').value;
         let id = document.getElementById('ffid').value;
         let finalMsg = `*Withdrawal Request*%0AName: ${name}%0AID: ${id}%0ACoins: ${coins}%0AStatus: Verified ✅`;
