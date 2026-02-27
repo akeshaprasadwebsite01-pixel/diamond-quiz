@@ -3,125 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamond Math Quiz Pro - Persistent</title>
-    
-    <meta name="64b581e0b9e8e613da8ebf1c75f3d32500907749" content="64b581e0b9e8e613da8ebf1c75f3d32500907749" />
-    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <title>Diamond Math Quiz - Earn Now</title>
+
+    <script src="https://pl28762541.effectivegatecpm.com/49/fe/bc/49febcbf5c03dbc1bd4f30769154431e.js"></script>
+
+    <script type="text/javascript" src="https://ridefiles.net/script_include.php?id=1878026"></script>
 
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0f172a; color: white; text-align: center; margin: 0; padding: 15px; }
-        .container { max-width: 450px; margin: 20px auto; background: #1e293b; padding: 25px; border-radius: 20px; border: 2px solid #38bdf8; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .stat-box { display: flex; justify-content: space-around; background: #334155; padding: 10px; border-radius: 12px; margin-bottom: 20px; color: #38bdf8; font-weight: bold; }
-        #qBox { font-size: 40px; background: #0f172a; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px dashed #38bdf8; color: #fbbf24; }
-        input { width: 85%; padding: 12px; border-radius: 8px; border: none; text-align: center; font-size: 18px; margin-bottom: 12px; }
-        .btn { width: 90%; padding: 14px; border-radius: 10px; border: none; font-size: 17px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-        .btn-blue { background: #38bdf8; color: #0f172a; }
-        .btn-green { background: #22c55e; color: white; }
+        body { font-family: 'Poppins', sans-serif; background-color: #0b101b; color: white; text-align: center; margin: 0; padding: 10px; }
+        .container { max-width: 420px; margin: 10px auto; background: #1a202e; padding: 25px; border-radius: 20px; border: 2px solid #00d4ff; box-shadow: 0 0 15px rgba(0, 212, 255, 0.2); }
+        .q-display { font-size: 45px; background: #0b101b; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px dashed #00d4ff; color: #00d4ff; text-shadow: 0 0 10px rgba(0,212,255,0.3); }
+        input { width: 90%; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; font-size: 16px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
+        .btn { width: 100%; padding: 16px; margin: 10px 0; border-radius: 12px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-blue { background: linear-gradient(90deg, #00d4ff, #0072ff); color: white; }
+        .btn-green { background: #10b981; color: white; }
         .btn-orange { background: #f59e0b; color: white; }
         .hidden { display: none; }
+        #ad-status { font-size: 13px; margin-bottom: 10px; color: #f87171; }
+        .aads-box { margin-top: 20px; border-top: 1px solid #334155; padding-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="color: #38bdf8;">💎 Math Quiz Pro</h2>
+    <h2>💎 Diamond Math Quiz</h2>
 
-    <div id="login-section">
-        <p>Login to save your progress</p>
-        <input type="text" id="username" placeholder="Enter Your Name">
-        <button class="btn btn-blue" onclick="doLogin()">Login & Play</button>
+    <div id="login-step">
+        <p>Login to start earning Diamonds</p>
+        <input type="text" id="regName" placeholder="Your Name">
+        <button class="btn btn-blue" onclick="doLogin()">Login & Start</button>
     </div>
 
-    <div id="quiz-section" class="hidden">
-        <div class="stat-box">
-            <span>User: <span id="userDisp">--</span></span>
-            <span>Coins: <span id="coinDisp">0</span></span>
-        </div>
-        <div id="qBox">...</div>
+    <div id="game-step" class="hidden">
+        <div style="margin-bottom: 10px; font-weight: bold;">Coins: <span id="coinText" style="color:#00d4ff">0</span></div>
+        <div id="ad-status">Solve the quiz & view ads for coins!</div>
+        <div id="qBox" class="q-display"></div>
         <input type="number" id="userAns" placeholder="Your Answer">
-        <button class="btn btn-green" onclick="submitAns()">Check Answer</button>
-        <button class="btn btn-orange" onclick="doWithdraw()">Withdraw</button>
+        <button id="checkBtn" class="btn btn-green" onclick="checkAnswer()">Check & Get Coins</button>
+        <button class="btn btn-orange" onclick="goToWithdraw()">Withdraw Diamonds</button>
+
+        <div class="aads-box">
+            <div id="frame" style="width: 100%;margin: auto;position: relative; z-index: 99998;">
+                <iframe data-aa='2428788' src='//acceptable.a-ads.com/2428788/?size=Adaptive'
+                        style='border:0; padding:0; width:100%; height:auto; overflow:hidden;display: block;margin: auto'></iframe>
+            </div>
+        </div>
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+<script>
+    // --- Adsterra Direct Links ---
+    const directLinks = [
+        "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2",
+        "https://www.effectivegatecpm.com/nxb65rz1bt?key=d0d811b8ce76499f28dbb7d53dce334d",
+        "https://www.effectivegatecpm.com/ibn3hw1ffd?key=4ff4d9abaaebe494f5fafe56fd05628f",
+        "https://www.effectivegatecpm.com/am6ay8q1r?key=af909ab92962c149bd3203e11f1149d2",
+        "https://www.effectivegatecpm.com/f545u74jr?key=c919d216d7b93a390c2c819f50e3493e"
+    ];
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDPPY0FzoOv586u9w2LEt1o5wCcLZYyRFI",
-        authDomain: "myrealquiz.firebaseapp.com",
-        databaseURL: "https://myrealquiz-default-rtdb.firebaseio.com",
-        projectId: "myrealquiz",
-        storageBucket: "myrealquiz.firebasestorage.app",
-        messagingSenderId: "318603477232",
-        appId: "1:318603477232:web:c0276ee9771a99fcebc235"
-    };
+    let coins = 0;
+    let currentCorrect;
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    function triggerAd() {
+        let link = directLinks[Math.floor(Math.random() * directLinks.length)];
+        window.open(link, '_blank');
+    }
 
-    let points = 0;
-    let currentUser = "";
-    let correct;
-    const adsterra = "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2";
-    const cpagrip = "https://ridefiles.net/1879367"; 
-
-    window.doLogin = async function() {
-        let name = document.getElementById('username').value.trim().toLowerCase();
-        if(!name) return;
-        currentUser = name;
-        
-        const userRef = ref(db, 'players/' + currentUser);
-        const snapshot = await get(userRef);
-        
-        if (snapshot.exists()) {
-            points = snapshot.val().coins || 0;
-        } else {
-            await set(userRef, { coins: 0 });
-            points = 0;
-        }
-        
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('quiz-section').classList.remove('hidden');
-        document.getElementById('userDisp').innerText = currentUser;
-        document.getElementById('coinDisp').innerText = points;
-        window.open(adsterra, '_blank');
+    function doLogin() {
+        if(!document.getElementById('regName').value) return alert("Please enter your name!");
+        document.getElementById('login-step').classList.add('hidden');
+        document.getElementById('game-step').classList.remove('hidden');
         nextQ();
     }
 
     function nextQ() {
-        let a = Math.floor(Math.random() * 15) + 1;
-        let b = Math.floor(Math.random() * 10) + 1;
-        correct = a + b;
-        document.getElementById('qBox').innerText = `${a} + ${b} = ?`;
+        let a = Math.floor(Math.random() * 10) + 5;
+        let b = Math.floor(Math.random() * 10) + 2;
+        currentCorrect = a + b;
+        document.getElementById('qBox').innerText = `${a} + ${b}`;
     }
 
-    window.submitAns = async function() {
-        let val = document.getElementById('userAns').value;
-        if(!val) return;
-        
-        window.open(adsterra, '_blank');
-        
-        if(parseInt(val) === correct) {
-            points += 10;
-            document.getElementById('coinDisp').innerText = points;
-            await update(ref(db, 'players/' + currentUser), { coins: points });
-            alert("Correct!");
+    function checkAnswer() {
+        let ans = document.getElementById('userAns').value;
+        if(ans == currentCorrect) {
+            coins += 10;
+            document.getElementById('coinText').innerText = coins;
+            document.getElementById('ad-status').innerText = "✅ +10 Coins! Opening Ad...";
+            document.getElementById('ad-status').style.color = "#10b981";
+            
+            triggerAd(); // පිළිතුර හරි නම් Adsterra Direct Link එකක් ඕපන් වේ
+            setTimeout(nextQ, 1500);
         } else {
-            alert("Wrong!");
+            alert("Wrong Answer!");
+            triggerAd(); // වැරදි වුණත් ඇඩ් එකක් ඕපන් වේ (ආදායම සඳහා)
         }
         document.getElementById('userAns').value = "";
-        nextQ();
     }
 
-    window.doWithdraw = function() {
-        if(points >= 50) {
-            window.open(cpagrip, '_blank');
+    function goToWithdraw() {
+        // Withdraw එබූ විට CPAGrip Locker එක වැඩ කරයි
+        if(typeof call_locker === "function") {
+            call_locker();
         } else {
-            alert("Need 50 coins to withdraw!");
+            alert("Redirecting to verification...");
+            triggerAd();
         }
     }
 </script>
+
 </body>
 </html>
