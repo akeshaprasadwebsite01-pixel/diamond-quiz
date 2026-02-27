@@ -3,113 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamond Math Quiz - Earn Now</title>
+    <title>Diamond Math Quiz Pro</title>
 
     <script src="https://pl28762541.effectivegatecpm.com/49/fe/bc/49febcbf5c03dbc1bd4f30769154431e.js"></script>
-
-    <script type="text/javascript" src="https://ridefiles.net/script_include.php?id=1878026"></script>
+    <script type="text/javascript" src="//data527.click/144013f1c20f08eb2898/04d0db5920/?placementName=default"></script>
+    <script type="text/javascript" src="//data527.click/2c35ab987fc520412599/21d3b338a3/?placementName=default"></script>
 
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #0b101b; color: white; text-align: center; margin: 0; padding: 10px; }
-        .container { max-width: 420px; margin: 10px auto; background: #1a202e; padding: 25px; border-radius: 20px; border: 2px solid #00d4ff; box-shadow: 0 0 15px rgba(0, 212, 255, 0.2); }
-        .q-display { font-size: 45px; background: #0b101b; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px dashed #00d4ff; color: #00d4ff; text-shadow: 0 0 10px rgba(0,212,255,0.3); }
-        input { width: 90%; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; font-size: 16px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
-        .btn { width: 100%; padding: 16px; margin: 10px 0; border-radius: 12px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-blue { background: linear-gradient(90deg, #00d4ff, #0072ff); color: white; }
+        :root { --primary: #00d4ff; --secondary: #f59e0b; --bg: #0b101b; --card: #1a202e; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: white; text-align: center; margin: 0; padding: 10px; }
+        .container { max-width: 480px; margin: 15px auto; background: var(--card); padding: 25px; border-radius: 25px; border: 1px solid rgba(0, 212, 255, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .stats-bar { display: flex; justify-content: space-around; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #334155; }
+        .stat-box { font-size: 14px; color: #9ca3af; }
+        .stat-box b { color: var(--primary); font-size: 18px; display: block; }
+
+        .q-display { font-size: 42px; background: #0f172a; padding: 25px; border-radius: 20px; margin-bottom: 20px; border: 2px dashed var(--primary); color: var(--primary); text-shadow: 0 0 15px rgba(0, 212, 255, 0.4); }
+        
+        input { width: 90%; padding: 14px; border-radius: 12px; margin-bottom: 15px; text-align: center; font-size: 16px; border: 1px solid #334155; background: #0b101b; color: white; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); }
+        
+        .btn { width: 100%; padding: 16px; margin: 8px 0; border-radius: 15px; border: none; font-size: 17px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-blue { background: linear-gradient(135deg, #00d4ff, #0072ff); color: white; }
         .btn-green { background: #10b981; color: white; }
-        .btn-orange { background: #f59e0b; color: white; }
+        .btn-orange { background: var(--secondary); color: white; margin-top: 15px; }
+
+        .withdraw-card { background: #0f172a; padding: 20px; border-radius: 20px; margin-top: 20px; border: 1px solid var(--secondary); display: none; }
+        .survey-wall { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 15px; margin-top: 25px; border: 1px solid #334155; }
+        .survey-item { background: #1f2937; padding: 15px; margin: 10px 0; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-left: 5px solid var(--primary); }
+        
+        #verify-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 99999; flex-direction: column; justify-content: center; align-items: center; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hidden { display: none; }
-        #ad-status { font-size: 13px; margin-bottom: 10px; color: #f87171; }
-        .aads-box { margin-top: 20px; border-top: 1px solid #334155; padding-top: 15px; }
     </style>
 </head>
 <body>
 
+<div id="verify-overlay">
+    <div class="loader"></div>
+    <h3 id="verify-text">Processing...</h3>
+    <p id="timer-text">Please wait 15 seconds</p>
+</div>
+
 <div class="container">
-    <h2>💎 Diamond Math Quiz</h2>
+    <h2>💎 DIAMOND QUIZ <span style="color:var(--primary)">PRO</span></h2>
+    <p style="font-size: 12px; color: #9ca3af;">Solve & Earn Real Rewards</p>
 
     <div id="login-step">
-        <p>Login to start earning Diamonds</p>
-        <input type="text" id="regName" placeholder="Your Name">
-        <button class="btn btn-blue" onclick="doLogin()">Login & Start</button>
+        <input type="text" id="playerName" placeholder="Enter Your Full Name">
+        <button class="btn btn-blue" onclick="startGame()">Login & Play</button>
     </div>
 
     <div id="game-step" class="hidden">
-        <div style="margin-bottom: 10px; font-weight: bold;">Coins: <span id="coinText" style="color:#00d4ff">0</span></div>
-        <div id="ad-status">Solve the quiz & view ads for coins!</div>
-        <div id="qBox" class="q-display"></div>
-        <input type="number" id="userAns" placeholder="Your Answer">
-        <button id="checkBtn" class="btn btn-green" onclick="checkAnswer()">Check & Get Coins</button>
-        <button class="btn btn-orange" onclick="goToWithdraw()">Withdraw Diamonds</button>
+        <div class="stats-bar">
+            <div class="stat-box">Player<b id="dispName">...</b></div>
+            <div class="stat-box">Balance<b id="coinCount">0</b></div>
+        </div>
 
-        <div class="aads-box">
-            <div id="frame" style="width: 100%;margin: auto;position: relative; z-index: 99998;">
-                <iframe data-aa='2428788' src='//acceptable.a-ads.com/2428788/?size=Adaptive'
-                        style='border:0; padding:0; width:100%; height:auto; overflow:hidden;display: block;margin: auto'></iframe>
-            </div>
+        <div id="qBox" class="q-display"></div>
+        <input type="number" id="userAnswer" placeholder="Enter Answer">
+        <button class="btn btn-green" onclick="processAnswer()">Check Answer (+10)</button>
+        <button class="btn btn-orange" onclick="toggleWithdraw()">Withdraw Rewards</button>
+
+        <div id="withdraw-form" class="withdraw-card">
+            <h3 style="color:var(--secondary)">Withdrawal Portal</h3>
+            <p style="font-size: 11px; color: #9ca3af;">Requirement: 5,000 Coins</p>
+            <input type="text" id="ffid" placeholder="Free Fire ID">
+            <input type="text" id="whatsapp" placeholder="WhatsApp Number">
+            <button class="btn btn-blue" onclick="handleWithdrawSubmit()">Submit Withdrawal</button>
+            <button class="btn" style="background:transparent; color:#9ca3af;" onclick="toggleWithdraw()">← Cancel</button>
+        </div>
+
+        <div class="survey-wall">
+            <h4 style="color:var(--primary); margin-bottom:10px;">🔥 Fast Coin Surveys</h4>
+            <div id="surveyList"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- Adsterra Direct Links ---
-    const directLinks = [
-        "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2",
-        "https://www.effectivegatecpm.com/nxb65rz1bt?key=d0d811b8ce76499f28dbb7d53dce334d",
-        "https://www.effectivegatecpm.com/ibn3hw1ffd?key=4ff4d9abaaebe494f5fafe56fd05628f",
-        "https://www.effectivegatecpm.com/am6ay8q1r?key=af909ab92962c149bd3203e11f1149d2",
-        "https://www.effectivegatecpm.com/f545u74jr?key=c919d216d7b93a390c2c819f50e3493e"
-    ];
-
     let coins = 0;
-    let currentCorrect;
+    let correctAnswer;
+    let playerName = "";
+    const ADMIN_WA = "947XXXXXXXX"; // Your WhatsApp Number
 
-    function triggerAd() {
-        let link = directLinks[Math.floor(Math.random() * directLinks.length)];
-        window.open(link, '_blank');
-    }
+    const ads = ["https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2"];
 
-    function doLogin() {
-        if(!document.getElementById('regName').value) return alert("Please enter your name!");
+    function startGame() {
+        playerName = document.getElementById('playerName').value;
+        if(!playerName) return alert("Please enter your name!");
         document.getElementById('login-step').classList.add('hidden');
         document.getElementById('game-step').classList.remove('hidden');
-        nextQ();
+        document.getElementById('dispName').innerText = playerName;
+        generateQ();
+        generateSurveys();
     }
 
-    function nextQ() {
-        let a = Math.floor(Math.random() * 10) + 5;
-        let b = Math.floor(Math.random() * 10) + 2;
-        currentCorrect = a + b;
-        document.getElementById('qBox').innerText = `${a} + ${b}`;
+    function generateQ() {
+        let n1 = Math.floor(Math.random() * 30) + 1;
+        let n2 = Math.floor(Math.random() * 20) + 1;
+        correctAnswer = n1 + n2;
+        document.getElementById('qBox').innerText = `${n1} + ${n2}`;
     }
 
-    function checkAnswer() {
-        let ans = document.getElementById('userAns').value;
-        if(ans == currentCorrect) {
+    function generateSurveys() {
+        const list = document.getElementById('surveyList');
+        for(let i=1; i<=6; i++) {
+            let r = Math.floor(Math.random() * 6) + 15;
+            list.innerHTML += `<div class="survey-item" onclick="verifyTask(${r})">
+                <span><b>Quick Task #${i}</b><br><small style="color:#10b981">+${r} Coins</small></span>
+                <span style="color:var(--primary)">Start ></span>
+            </div>`;
+        }
+    }
+
+    function verifyTask(reward) {
+        window.open(ads[0], '_blank');
+        showOverlay(15, () => {
+            coins += reward;
+            document.getElementById('coinCount').innerText = coins;
+            alert("Reward Claimed!");
+        });
+    }
+
+    function showOverlay(sec, callback) {
+        const overlay = document.getElementById('verify-overlay');
+        overlay.style.display = 'flex';
+        let time = sec;
+        let itv = setInterval(() => {
+            time--;
+            document.getElementById('timer-text').innerText = `Verifying... ${time}s`;
+            if(time <= 0) {
+                clearInterval(itv);
+                overlay.style.display = 'none';
+                callback();
+            }
+        }, 1000);
+    }
+
+    function processAnswer() {
+        if(document.getElementById('userAnswer').value == correctAnswer) {
             coins += 10;
-            document.getElementById('coinText').innerText = coins;
-            document.getElementById('ad-status').innerText = "✅ +10 Coins! Opening Ad...";
-            document.getElementById('ad-status').style.color = "#10b981";
-            
-            triggerAd(); // පිළිතුර හරි නම් Adsterra Direct Link එකක් ඕපන් වේ
-            setTimeout(nextQ, 1500);
-        } else {
-            alert("Wrong Answer!");
-            triggerAd(); // වැරදි වුණත් ඇඩ් එකක් ඕපන් වේ (ආදායම සඳහා)
-        }
-        document.getElementById('userAns').value = "";
+            document.getElementById('coinCount').innerText = coins;
+            window.open(ads[0], '_blank');
+            generateQ();
+        } else { alert("Wrong!"); }
+        document.getElementById('userAnswer').value = "";
     }
 
-    function goToWithdraw() {
-        // Withdraw එබූ විට CPAGrip Locker එක වැඩ කරයි
-        if(typeof call_locker === "function") {
-            call_locker();
-        } else {
-            alert("Redirecting to verification...");
-            triggerAd();
-        }
+    function toggleWithdraw() {
+        const f = document.getElementById('withdraw-form');
+        f.style.display = (f.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function handleWithdrawSubmit() {
+        let ffid = document.getElementById('ffid').value;
+        let wa = document.getElementById('whatsapp').value;
+        if(!ffid || !wa) return alert("Fill all details!");
+
+        window.open(ads[0], '_blank'); // Open Ad
+        
+        showOverlay(10, () => {
+            if(coins >= 5000) {
+                alert("Withdrawal Successful! Sending details to WhatsApp...");
+                let msg = `WITHDRAWAL REQUEST%0A%0AName: ${playerName}%0AFF ID: ${ffid}%0AWA: ${wa}%0ACoins: ${coins}`;
+                window.open(`https://wa.me/${ADMIN_WA}?text=${msg}`, '_blank');
+            } else {
+                alert("Insufficient Balance! You need at least 5000 coins.");
+            }
+        });
     }
 </script>
-
 </body>
 </html>
