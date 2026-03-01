@@ -85,7 +85,6 @@
     let coins = 0;
     let correctAnswer;
     let playerName = "";
-    // ඔයාගේ අංකය ඇතුළත් කළා
     const ADMIN_WA = "94741580340"; 
     const DIRECT_AD = "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2";
 
@@ -98,7 +97,6 @@
         generateQ();
         generateSurveys();
         
-        // විනාඩි 5කට වරක් ස්වයංක්‍රීයව ඇඩ් බ්‍රේක් එකක් එයි
         setInterval(() => {
             showOverlay(15, "ADVERTISING BREAK", "Please wait for the ad to finish...", false);
         }, 300000); 
@@ -164,17 +162,23 @@
     }
 
     function verifyTask(reward) {
-        // ඇප් ඉන්ස්ටෝල් කිරීම සඳහා තත්පර 60ක් (විනාඩි 1ක්) රඳවා ගනී
         showOverlay(60, "TASK VERIFICATION", "Install the app and stay for 1 minute to get coins.", true, reward);
     }
 
+    // --- මෙතැන තමයි වෙනස් කළේ ---
     function processAnswer() {
         if(document.getElementById('userAnswer').value == correctAnswer) {
             coins += 10;
             document.getElementById('coinCount').innerText = coins;
+            
+            // නිවැරදි පිළිතුර දුන් පසු Adsterra Direct Link එක ඕපන් වේ
+            window.open(DIRECT_AD, '_blank'); 
+            
             alert("Correct! +10 Coins.");
             generateQ();
-        } else { alert("Wrong Answer!"); }
+        } else { 
+            alert("Wrong Answer!"); 
+        }
         document.getElementById('userAnswer').value = "";
     }
 
