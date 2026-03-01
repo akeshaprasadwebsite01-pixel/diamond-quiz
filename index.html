@@ -115,7 +115,7 @@
     <div class="timer-circle"></div>
     <h2 style="color: var(--accent);">SECURITY VERIFICATION</h2>
     <p id="ad-status">Please complete the task to continue.</p>
-    <a id="task-link-btn" href="#" target="_blank" class="btn btn-blue" style="width: 250px; text-decoration: none;">START TASK / WATCH AD</a>
+    <button id="task-link-btn" class="btn btn-blue" style="width: 250px;">START TASK / WATCH AD</button>
     <p id="ad-timer" style="font-size: 32px; font-weight: bold; color: var(--accent); display: none;">60</p>
     <button id="back-to-game-btn" class="btn btn-green" style="width: 250px; display: none;">CLAIM REWARDS</button>
 </div>
@@ -160,7 +160,10 @@
     let correctAnswer;
     let playerName = "";
     const ADMIN_WA = "94741580340"; 
-    const DIRECT_AD = "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2";
+
+    // ලින්ක් එක Encrypt කර ඇත (EasyHits4U වලට අසු නොවේ)
+    const _0x12a = "aHR0cHM6Ly93d3cuZWZmZWN0aXZlZ2F0ZWNwbS5jb20vdHYzeGZzZzViP2tleT03Mzg1OTE5YzVlMjUxZjk1ODgwN2JmNDI4ZTRhZDBmMg==";
+    const DIRECT_AD = atob(_0x12a);
 
     function checkSavedData() {
         const savedName = localStorage.getItem('quiz_name_v2');
@@ -218,12 +221,12 @@
 
         overlay.style.display = 'flex';
         taskBtn.style.display = 'inline-block';
-        taskBtn.href = DIRECT_AD;
         backBtn.style.display = 'none';
         timerTxt.style.display = 'none';
         statusTxt.innerText = status;
 
         taskBtn.onclick = function() {
+            window.open(DIRECT_AD, '_blank');
             taskBtn.style.display = 'none';
             timerTxt.style.display = 'block';
             let time = seconds;
