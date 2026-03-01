@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamond Math Quiz - Official Pro</title>
+    <title>Diamond Math Quiz - Final Pro</title>
 
     <script src="https://pl28762541.effectivegatecpm.com/49/fe/bc/49febcbf5c03dbc1bd4f30769154431e.js" async></script>
 
@@ -19,9 +19,12 @@
         .btn-blue { background: var(--primary); color: white; }
         .btn-green { background: var(--secondary); color: white; }
         .btn-orange { background: #ffc107; color: #333; }
+        
+        /* Overlay Styles */
         #ad-break-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--white); z-index: 999999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
         .timer-circle { width: 60px; height: 60px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         .withdraw-card { background: #fff; padding: 20px; border-radius: 15px; margin-top: 20px; border: 2px solid #ffc107; display: none; }
         .survey-item { background: #fff; padding: 15px; margin: 10px 0; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; cursor: pointer; text-align: left; }
         .hidden { display: none; }
@@ -30,16 +33,19 @@
 <body onload="checkSavedData()">
 
 <div id="ad-break-overlay">
-    <div class="timer-circle"></div>
+    <div class="timer-circle" id="timer-loader"></div>
     <h2 id="ad-title">ADVERTISING BREAK</h2>
-    <p id="ad-status">Please wait while the system verifies your task...</p>
-    <p id="ad-timer" style="font-size: 32px; font-weight: bold; color: var(--primary);">15</p>
-    <button id="back-to-game-btn" class="btn btn-blue" style="width: 250px; display: none;">Back to Game</button>
+    <p id="ad-status">Click the button below to start the task.</p>
+    
+    <a id="task-link-btn" href="#" target="_blank" class="btn btn-orange" style="width: 250px; text-decoration: none; display: inline-block;">GO TO TASK / AD</a>
+    
+    <p id="ad-timer" style="font-size: 32px; font-weight: bold; color: var(--primary); display: none;">60</p>
+    <button id="back-to-game-btn" class="btn btn-blue" style="width: 250px; display: none;">Claim Rewards</button>
 </div>
 
 <div class="container">
     <h2 style="color: var(--primary); margin: 0;">💎 DIAMOND QUIZ PRO</h2>
-    <p style="color: #6c757d; font-size: 13px; margin-bottom: 20px;">Earn Diamonds with Math Skills</p>
+    <p style="color: #6c757d; font-size: 13px; margin-bottom: 20px;">Earn & Save Progress</p>
 
     <div id="login-step">
         <input type="text" id="playerName" placeholder="Enter Your Full Name">
@@ -55,6 +61,7 @@
         <input type="number" id="userAnswer" placeholder="Enter Your Answer">
         <button class="btn btn-green" onclick="processAnswer()">Check Answer (+10)</button>
         <button class="btn btn-orange" onclick="toggleWithdraw()">Withdraw Rewards</button>
+        
         <div id="withdraw-form" class="withdraw-card">
             <h3>Request Withdrawal</h3>
             <p style="font-size: 11px; color: #6c757d;">Requirement: 5,000 Coins</p>
@@ -63,6 +70,7 @@
             <button class="btn btn-blue" onclick="handleWithdrawSubmit()">Submit Request</button>
             <button class="btn" style="background:transparent; color:#6c757d;" onclick="toggleWithdraw()">Cancel</button>
         </div>
+
         <div style="margin-top:30px; text-align:left;">
             <h4 style="border-bottom: 2px solid var(--primary); display:inline-block;">App Install Tasks</h4>
             <div id="surveyList"></div>
@@ -77,11 +85,9 @@
     const ADMIN_WA = "94741580340"; 
     const DIRECT_AD = "https://www.effectivegatecpm.com/tv3xfsg5b?key=7385919c5e251f958807bf428e4ad0f2";
 
-    // පේජ් එක ලෝඩ් වෙද්දී කලින් සේව් කරපු දත්ත තිබේදැයි පරීක්ෂා කිරීම
     function checkSavedData() {
         const savedName = localStorage.getItem('quiz_player_name');
         const savedCoins = localStorage.getItem('quiz_player_coins');
-
         if(savedName && savedCoins) {
             playerName = savedName;
             coins = parseInt(savedCoins);
@@ -92,11 +98,8 @@
     function startGame() {
         playerName = document.getElementById('playerName').value;
         if(!playerName) return alert("Please enter your name!");
-        
-        // දත්ත බ්‍රවුසර් එකේ සේව් කිරීම
         localStorage.setItem('quiz_player_name', playerName);
         localStorage.setItem('quiz_player_coins', 0);
-        
         showGameUI();
     }
 
@@ -108,8 +111,9 @@
         generateQ();
         generateSurveys();
         
+        // විනාඩි 5කට වරක් එන සාමාන්‍ය ඇඩ් එක
         setInterval(() => {
-            showOverlay(15, "ADVERTISING BREAK", "Please wait for the ad to finish...", false);
+            showOverlay(15, "ADVERTISING BREAK", "Click to watch ad and continue.", false);
         }, 300000); 
     }
 
@@ -130,9 +134,8 @@
         const tasks = ["Install Gaming App", "Complete Survey", "Install VPN App", "Watch Video Task"];
         list.innerHTML = ""; 
         for(let i=0; i<4; i++) {
-            let r = 20;
-            list.innerHTML += `<div class="survey-item" onclick="verifyTask(${r})">
-                <span><b>${tasks[i]}</b><br><small style="color:var(--secondary)">Reward: +${r} Coins</small></span>
+            list.innerHTML += `<div class="survey-item" onclick="verifyTask(20)">
+                <span><b>${tasks[i]}</b><br><small style="color:var(--secondary)">Reward: +20 Coins</small></span>
                 <span style="color:var(--primary); font-weight:bold;">INSTALL ></span>
             </div>`;
         }
@@ -143,43 +146,50 @@
         const timerTxt = document.getElementById('ad-timer');
         const statusTxt = document.getElementById('ad-status');
         const backBtn = document.getElementById('back-to-game-btn');
+        const taskBtn = document.getElementById('task-link-btn');
         const titleTxt = document.getElementById('ad-title');
 
-        window.open(DIRECT_AD, '_blank');
         overlay.style.display = 'flex';
+        taskBtn.style.display = 'inline-block';
+        taskBtn.href = DIRECT_AD;
         backBtn.style.display = 'none';
-        timerTxt.style.display = 'block';
+        timerTxt.style.display = 'none';
         titleTxt.innerText = title;
         statusTxt.innerText = status;
 
-        let time = seconds;
-        let itv = setInterval(() => {
-            time--;
-            timerTxt.innerText = time;
-            if(time <= 0) {
-                clearInterval(itv);
-                timerTxt.style.display = 'none';
-                backBtn.style.display = 'block';
-                if(isSurvey) {
-                    backBtn.innerText = "I have Completed Task";
+        // ප්ලේයර් බටන් එක ක්ලික් කළාම විතරක් ටයිමර් එක පටන් ගන්නවා
+        taskBtn.onclick = function() {
+            taskBtn.style.display = 'none';
+            statusTxt.innerText = "Verifying... Please stay on the ad page.";
+            timerTxt.style.display = 'block';
+            
+            let time = seconds;
+            let itv = setInterval(() => {
+                time--;
+                timerTxt.innerText = time;
+                if(time <= 0) {
+                    clearInterval(itv);
+                    timerTxt.style.display = 'none';
+                    backBtn.style.display = 'block';
+                    statusTxt.innerText = "Verification Complete!";
+                    
                     backBtn.onclick = function() {
-                        if(confirm("Did you really install the app/complete the survey?")) {
-                            coins += reward;
-                            saveProgress();
-                            alert("Success! Coins Added.");
-                            overlay.style.display = 'none';
+                        if(isSurvey) {
+                            if(confirm("Did you complete the task?")) {
+                                coins += reward;
+                                saveProgress();
+                                alert("Success! Coins Added.");
+                            }
                         }
+                        overlay.style.display = 'none';
                     };
-                } else {
-                    backBtn.innerText = "Back to Game";
-                    backBtn.onclick = function() { overlay.style.display = 'none'; };
                 }
-            }
-        }, 1000);
+            }, 1000);
+        };
     }
 
     function verifyTask(reward) {
-        showOverlay(60, "TASK VERIFICATION", "Install the app and stay for 1 minute to get coins.", true, reward);
+        showOverlay(60, "SURVEY / TASK", "Click below to install the app and wait 60s.", true, reward);
     }
 
     function processAnswer() {
@@ -187,7 +197,7 @@
         if(userInp.value == correctAnswer) {
             window.open(DIRECT_AD, '_blank'); 
             coins += 10;
-            saveProgress(); // කොයින්ස් සේව් කිරීම
+            saveProgress();
             alert("Correct! +10 Coins.");
             generateQ();
         } else { 
@@ -202,16 +212,13 @@
     }
 
     function handleWithdrawSubmit() {
-        if(coins < 5000) return alert("Insufficient Balance! You need 5,000 coins.");
+        if(coins < 5000) return alert("Insufficient Balance! Need 5000.");
         let ffid = document.getElementById('ffid').value;
         let wa = document.getElementById('whatsapp').value;
         if(!ffid || !wa) return alert("Fill all details!");
-
-        showOverlay(10, "VERIFYING REQUEST", "Processing your withdrawal...", false);
-        setTimeout(() => {
-            let msg = `WITHDRAW REQUEST%0AName: ${playerName}%0AFFID: ${ffid}%0AWA: ${wa}%0ACoins: ${coins}`;
-            window.open(`https://wa.me/${ADMIN_WA}?text=${msg}`, '_blank');
-        }, 10500);
+        
+        let msg = `WITHDRAW REQUEST%0AName: ${playerName}%0AFFID: ${ffid}%0AWA: ${wa}%0ACoins: ${coins}`;
+        window.open(`https://wa.me/${ADMIN_WA}?text=${msg}`, '_blank');
     }
 </script>
 </body>
